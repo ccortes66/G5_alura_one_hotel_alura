@@ -11,6 +11,9 @@ import com.alura.hotelalura.ssr.error.ErrorResponse;
 import com.google.inject.Injector;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import io.javalin.http.Handler;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -26,6 +29,8 @@ public class CookieController
     private ErrorResponse response;
     private final LoginRepository loginService;
     private final ClienteRepository clienteService;
+    @Getter
+    private static String dinUsusario;
 
     public CookieController(Javalin javalin, Injector injector)
     {
@@ -91,6 +96,7 @@ public class CookieController
     private void setSessionCookie(Context context,String dni)
     {
        context.cookie("dni",dni,3600);
+       dinUsusario = dni;
     }
 
     public String getSessionCookie(Context context)
@@ -140,6 +146,29 @@ public class CookieController
                                context.render("formulario.jte", Collections.singletonMap("response", response));}
 
 
+
+    }
+
+    public static class MiddewareCookie implements Handler
+    {
+
+        @Override
+        public void handle(@NotNull Context context) throws Exception
+        {
+            if(!isValidCookie(context) && !context.path().equals("/registrar"))
+              {context.render("login.jte");}
+        }
+
+        private boolean isValidCookie(Context context)
+        {
+            String coockie = getSessionCookie(context);
+            return coockie != null && !coockie.isEmpty();
+        }
+
+        public String getSessionCookie(Context context)
+        {
+            return context.cookie("dni");
+        }
 
     }
 }

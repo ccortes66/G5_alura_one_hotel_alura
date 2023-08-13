@@ -137,7 +137,8 @@ public class ClienteController
         if( reserva.checkIn().isEqual(reserva.checkOut()))
           { throw new BadRequestResponse("Es la misma fecha"); }
 
-        if( reserva.checkIn().isBefore(LocalDate.now()) || reserva.checkOut().isBefore(LocalDate.now()))
+        if( reserva.checkIn().isBefore(LocalDate.now()) || reserva.checkOut().isBefore(LocalDate.now()) ||
+                reserva.checkIn().isAfter(reserva.checkOut()))
           { throw new BadRequestResponse("Las fechas pertenecen al dia o dias anteriores"); }
 
         if(reserva.metodoPago().trim().isEmpty())

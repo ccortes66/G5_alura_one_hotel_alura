@@ -43,14 +43,18 @@ public class ReservaService implements ReservaRepository
     @Override
     public Byte eliminar(String codigo)
     {
-
+        entityManager.getTransaction().begin();
         try
         {
-            System.out.println(this.buscar(codigo));
+            entityManager.remove(this.buscar(codigo));
+            entityManager.flush();
+            entityManager.getTransaction().commit();
+            entityManager.clear();
             return 1;
         }catch (Exception ex)
-        {
-         return 0;}
+        {  entityManager.getTransaction().rollback();
+         return 0;
+        }
     }
 
 
@@ -60,13 +64,14 @@ public class ReservaService implements ReservaRepository
         entityManager.getTransaction().begin();
         try
           {
-              entityManager.persist(reserva);
+              entityManager.merge(reserva);
               entityManager.flush();
               entityManager.getTransaction().commit();
               entityManager.clear();
           }
         catch (Exception ex)
-          {entityManager.getTransaction().rollback();}
+          {entityManager.getTransaction().rollback();
+          ex.printStackTrace();}
     }
 
     @Override
@@ -102,8 +107,7 @@ public class ReservaService implements ReservaRepository
     public List<ReservaInfo> listarReservaPorCliente(String dni) {
         jpql = "SELECT NEW com.alura.hotelalura.repository.dto.ReservaInfo(RS.reserva,RS.checkIn,RS.checkOut,RS.valorReserva,RS.habitacion.tipo.nombre,RS.habitacion.numero) "+
                 "FROM Reserva RS " +
-                "WHERE RS.cliente.usuario.dni = :dni "+
-                "ORDER BY RS.id DESC";
+                "WHERE RS.cliente.usuario.dni = :dni ";
         TypedQuery<ReservaInfo> query = entityManager.createQuery(jpql, ReservaInfo.class);
         query.setParameter("dni",dni.trim());
         return query.getResultList();

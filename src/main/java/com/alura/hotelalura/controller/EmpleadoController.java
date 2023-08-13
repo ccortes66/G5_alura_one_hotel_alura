@@ -22,6 +22,7 @@ import com.google.inject.Injector;
 import io.javalin.Javalin;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
+import io.javalin.http.InternalServerErrorResponse;
 import io.javalin.http.NotFoundResponse;
 
 public class EmpleadoController
@@ -242,7 +243,7 @@ public class EmpleadoController
                 context.result("Habitacion creada");}
             else {throw new BadRequestResponse("La habitacion ya esta creada");}
 
-        }catch (Exception ex){throw new BadRequestResponse("Hay errores en la informacion"); }
+        }catch (Exception ex){throw new BadRequestResponse(ex.getMessage()); }
     }
 
     private void eliminarHabitacion(Context context)
@@ -274,7 +275,11 @@ public class EmpleadoController
     private void eliminarReservacion(Context context)
     {
         String reserva = context.pathParam("reserva");
-        System.out.println(reservaService.eliminar(reserva.trim()));
+        Byte result = reservaService.eliminar(reserva);
+        if(result>=1)
+          {context.result("Reserva Eliminada");}
+        else
+          {throw new InternalServerErrorResponse("error interno");}
 
     }
 

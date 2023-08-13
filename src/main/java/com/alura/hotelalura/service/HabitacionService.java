@@ -58,13 +58,14 @@ public class HabitacionService implements HabitacionRepository
         entityManager.getTransaction().begin();
         try
         {
-            entityManager.persist(habitacion);
+            entityManager.merge(habitacion);
             entityManager.flush();
             entityManager.getTransaction().commit();
             entityManager.clear();
             return 1;
         }catch (Exception ex)
         {entityManager.getTransaction().rollback();
+            ex.printStackTrace();
          return 0;}
     }
 

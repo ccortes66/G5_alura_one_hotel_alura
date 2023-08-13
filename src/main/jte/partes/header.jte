@@ -1,7 +1,7 @@
 @import com.alura.hotelalura.model.Usuario
 @param Usuario user
 
-
+<div class="col-sm p-3 min-vh-100">
 <nav class="navbar navbar-expand-lg bg-body-tertiary container-fluid border-body">
     <div class="container-fluid ">
         <a class="navbar-brand" href="#">Hotel Alura</a>
@@ -23,3 +23,4 @@
         </div>
     </div>
 </nav>
+</div>

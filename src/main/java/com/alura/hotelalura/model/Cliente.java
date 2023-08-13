@@ -16,7 +16,7 @@ public class Cliente
     @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @NonNull
     private Usuario usuario;
 
