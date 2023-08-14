@@ -4,6 +4,7 @@ import com.alura.hotelalura.model.Cliente;
 import com.alura.hotelalura.model.Reserva;
 import com.alura.hotelalura.repository.dto.ReservaInfo;
 import com.alura.hotelalura.repository.dto.ReservaInfoEmpleados;
+import com.alura.hotelalura.repository.dto.ReservaInfoSsr;
 import com.alura.hotelalura.repository.persistence.ReservaRepository;
 import com.google.inject.Inject;
 
@@ -70,8 +71,7 @@ public class ReservaService implements ReservaRepository
               entityManager.clear();
           }
         catch (Exception ex)
-          {entityManager.getTransaction().rollback();
-          ex.printStackTrace();}
+          {entityManager.getTransaction().rollback();}
     }
 
     @Override
@@ -85,6 +85,19 @@ public class ReservaService implements ReservaRepository
         TypedQuery<ReservaInfo> query = entityManager.createQuery(jpql,ReservaInfo.class);
         query.setParameter("dni",dni);
         query.setParameter("reserva",reserva.trim());
+        return query.getSingleResult();
+    }
+
+    @Override
+    public ReservaInfoSsr buscarResultado(String dni)
+    {
+        jpql = "SELECT NEW com.alura.hotelalura.repository.dto.ReservaInfoSsr(RS.reserva,RS.valorReserva,RS.habitacion.numero) "+
+                "FROM Reserva RS " +
+                "WHERE RS.cliente.usuario.dni = :dni "+
+                "ORDER BY RS.id DESC";
+        TypedQuery<ReservaInfoSsr> query = entityManager.createQuery(jpql, ReservaInfoSsr.class);
+        query.setParameter("dni",dni.trim());
+        query.setMaxResults(1);
         return query.getSingleResult();
     }
 

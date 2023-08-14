@@ -18,8 +18,9 @@
                 <form action="/authetication" method="post">
 
                     @if(response != null)
-                        <div class="alert alert-danger " role="alert">
-                            <strong>Error ${response.status()} </strong> ${response.Detail()}.
+                        <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+                            <strong>Error ${response.status()} </strong> ${response.Detail()}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
 

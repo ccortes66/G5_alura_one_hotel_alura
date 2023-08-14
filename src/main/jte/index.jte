@@ -35,12 +35,12 @@
                      @if(infoList != null)
                          @for(ReservaInfo reservaInfo: infoList)
                              <tr>
-                                 <td>${reservaInfo.reserva()}</td>
-                                 <td>${String.valueOf(reservaInfo.checkIn())}</td>
-                                 <td>${String.valueOf(reservaInfo.checkOut())}</td>
-                                 <td>${new DecimalFormat("#,###.00").format(reservaInfo.precio())}</td>
-                                 <td>${reservaInfo.categoria()}</td>
-                                 <td>${reservaInfo.habitacion().toString()}</td>
+                                 <td class="text-capitalize">${reservaInfo.reserva()}</td>
+                                 <td class="text-capitalize">${String.valueOf(reservaInfo.checkIn())}</td>
+                                 <td class="text-capitalize">${String.valueOf(reservaInfo.checkOut())}</td>
+                                 <td class="text-capitalize">${new DecimalFormat("#,###.00").format(reservaInfo.precio())}</td>
+                                 <td class="text-capitalize">${reservaInfo.categoria()}</td>
+                                 <td class="text-capitalize">${reservaInfo.habitacion().toString()}</td>
                              </tr>
                          @endfor
                      @endif

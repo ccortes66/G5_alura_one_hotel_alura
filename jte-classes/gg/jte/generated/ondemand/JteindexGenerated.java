@@ -16,22 +16,22 @@ public final class JteindexGenerated {
 		if (infoList != null) {
 			jteOutput.writeContent("\n                         ");
 			for (ReservaInfo reservaInfo: infoList) {
-				jteOutput.writeContent("\n                             <tr>\n                                 <td>");
+				jteOutput.writeContent("\n                             <tr>\n                                 <td class=\"text-capitalize\">");
 				jteOutput.setContext("td", null);
 				jteOutput.writeUserContent(reservaInfo.reserva());
-				jteOutput.writeContent("</td>\n                                 <td>");
+				jteOutput.writeContent("</td>\n                                 <td class=\"text-capitalize\">");
 				jteOutput.setContext("td", null);
 				jteOutput.writeUserContent(String.valueOf(reservaInfo.checkIn()));
-				jteOutput.writeContent("</td>\n                                 <td>");
+				jteOutput.writeContent("</td>\n                                 <td class=\"text-capitalize\">");
 				jteOutput.setContext("td", null);
 				jteOutput.writeUserContent(String.valueOf(reservaInfo.checkOut()));
-				jteOutput.writeContent("</td>\n                                 <td>");
+				jteOutput.writeContent("</td>\n                                 <td class=\"text-capitalize\">");
 				jteOutput.setContext("td", null);
 				jteOutput.writeUserContent(new DecimalFormat("#,###.00").format(reservaInfo.precio()));
-				jteOutput.writeContent("</td>\n                                 <td>");
+				jteOutput.writeContent("</td>\n                                 <td class=\"text-capitalize\">");
 				jteOutput.setContext("td", null);
 				jteOutput.writeUserContent(reservaInfo.categoria());
-				jteOutput.writeContent("</td>\n                                 <td>");
+				jteOutput.writeContent("</td>\n                                 <td class=\"text-capitalize\">");
 				jteOutput.setContext("td", null);
 				jteOutput.writeUserContent(reservaInfo.habitacion().toString());
 				jteOutput.writeContent("</td>\n                             </tr>\n                         ");

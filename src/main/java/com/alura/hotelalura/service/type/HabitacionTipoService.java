@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -63,5 +64,12 @@ public class HabitacionTipoService implements HabitacionTipoRepository
         HabitacionTipo habitacionTipo = this.buscar(habitacion.tipo().trim());
         long duracion = ChronoUnit.DAYS.between(habitacion.checkIn(),habitacion.checkOut());
         return habitacionTipo.getPrecioUnitario().multiply(new BigDecimal(duracion));
+    }
+
+    @Override
+    public BigDecimal consultarPrecioHabitacion(LocalDate checkInt,LocalDate checkOut,String tipoHabitacion)
+    {
+        long duracion = ChronoUnit.DAYS.between(checkInt,checkOut);
+        return this.buscar(tipoHabitacion.trim()).getPrecioUnitario().multiply(new BigDecimal(duracion));
     }
 }

@@ -139,7 +139,7 @@ public class ClienteController
 
         if( reserva.checkIn().isBefore(LocalDate.now()) || reserva.checkOut().isBefore(LocalDate.now()) ||
                 reserva.checkIn().isAfter(reserva.checkOut()))
-          { throw new BadRequestResponse("Las fechas pertenecen al dia o dias anteriores"); }
+          { throw new BadRequestResponse("Las fechas pertenecen al día o días anteriores"); }
 
         if(reserva.metodoPago().trim().isEmpty())
           {throw new BadRequestResponse("Campo est vacio");}

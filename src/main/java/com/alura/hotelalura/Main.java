@@ -24,7 +24,8 @@ public class Main
 
         Injector injector = Guice.createInjector(new CDI());
 
-       //rest api
+
+
         Javalin restApi = Javalin.create().start(8080);
         new ClienteController(restApi,injector);
         new LoginController(restApi,injector);
