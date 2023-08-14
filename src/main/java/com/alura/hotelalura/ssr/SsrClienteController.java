@@ -13,6 +13,7 @@ import com.alura.hotelalura.service.ClienteService;
 import com.alura.hotelalura.service.HabitacionService;
 import com.alura.hotelalura.service.ReservaService;
 import com.alura.hotelalura.service.type.HabitacionTipoService;
+import com.alura.hotelalura.ssr.dto.ListarBusqueda;
 import com.alura.hotelalura.ssr.dto.ListarCatrgoriaMetodo;
 import com.alura.hotelalura.ssr.error.ErrorResponse;
 import com.google.inject.Injector;
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class SsrClienteController
 {
@@ -37,6 +39,9 @@ public class SsrClienteController
     private ReservaInfo reservaInfo = null;
     private final ClienteRepository clienteService;
     private final HabitacionRepository habitacionService;
+    private List<ReservaInfo> infoList;
+
+    private ListarBusqueda busqueda;
 
 
     public SsrClienteController(Javalin javalin, Injector injector)
@@ -57,6 +62,8 @@ public class SsrClienteController
     {
         javalin.after("/listar/reservaciones",new CookieController.MiddewareCookie());
         javalin.after("/generar/reservacion",new CookieController.MiddewareCookie());
+        javalin.after("/buscar/reservacion",new CookieController.MiddewareCookie());
+        javalin.after("/busqueda",new CookieController.MiddewareCookie());
     }
 
     private void cargarEvento()
@@ -64,7 +71,7 @@ public class SsrClienteController
 
 
         javalin.get("/listar/reservaciones",context -> {
-            List<ReservaInfo> infoList = reservaService.listarReservaPorCliente(CookieController.getDinUsusario());
+            this.infoList = reservaService.listarReservaPorCliente(CookieController.getDinUsusario());
             context.render("index.jte", Collections.singletonMap("infoList",infoList));
         });
 
@@ -80,11 +87,29 @@ public class SsrClienteController
         });
 
         javalin.get("/buscar/reservacion",context -> {
-                   context.render("buscar.jte",Collections.singletonMap("reservaInfo",reservaInfo));
+            this.infoList = reservaService.listarReservaPorCliente(CookieController.getDinUsusario());
+            ListarBusqueda busqueda = new ListarBusqueda(this.infoList,null);
+            context.render("buscar.jte",Collections.singletonMap("busqueda",busqueda));
+        });
+
+        javalin.get("/busqueda",context ->
+        {
+            this.busqueda = null;
+            this.infoList = reservaService.listarReservaPorCliente(CookieController.getDinUsusario());
+            Optional<ReservaInfo> myReservainfo = this.infoList.stream()
+                                         .filter(data -> data.reserva().equals(context.queryParam("busqueda")))
+                                         .findFirst();
+            myReservainfo.ifPresentOrElse(
+                    info -> this.busqueda = new ListarBusqueda(this.infoList,info),
+                    () -> this.busqueda =  new ListarBusqueda(null,null)
+            );
+
+            context.render("buscar.jte",Collections.singletonMap("busqueda",busqueda));
         });
 
 
         javalin.post("/generar/reservacion",this::generarReservacion);
+
 
 
     }

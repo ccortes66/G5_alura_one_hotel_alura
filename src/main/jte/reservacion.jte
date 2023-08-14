@@ -2,6 +2,7 @@
 @import com.alura.hotelalura.repository.dto.ReservaInfo
 @import com.alura.hotelalura.ssr.dto.ListarCatrgoriaMetodo
 @import com.alura.hotelalura.ssr.CookieController
+@import java.text.DecimalFormat
 
 @param Usuario user
 @param ReservaInfo reservaInfo
@@ -78,7 +79,7 @@
                              <h4 class="alert-heading">¡La reserva se ha realizado con éxito!</h4>
                              <p> Esperamos que disfrute de su estancia en el Hotel Alura. Aquí tiene los detalles de su reserva:</p>
                              <p> ID: ${metodo.info().reserva()} </p>
-                             <p> Precio (en USD):${metodo.info().valor()} </p>
+                             <p> Precio (en USD):${new DecimalFormat("#,###.00").format(metodo.info().valor())} </p>
                              <p> Número de habitación: ${metodo.info().habitacion()}</p>
                              <hr>
                              <p class="mb-0">Whenever you need to, be sure to use margin utilities to keep things nice and tidy.</p>

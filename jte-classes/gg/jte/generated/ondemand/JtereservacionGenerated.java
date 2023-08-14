@@ -3,9 +3,10 @@ import com.alura.hotelalura.model.Usuario;
 import com.alura.hotelalura.repository.dto.ReservaInfo;
 import com.alura.hotelalura.ssr.dto.ListarCatrgoriaMetodo;
 import com.alura.hotelalura.ssr.CookieController;
+import java.text.DecimalFormat;
 public final class JtereservacionGenerated {
 	public static final String JTE_NAME = "reservacion.jte";
-	public static final int[] JTE_LINE_INFO = {0,0,1,2,3,5,5,5,12,12,12,18,18,21,22,24,42,42,43,43,44,44,44,44,44,44,44,44,44,44,44,44,45,45,46,46,53,53,54,54,55,55,55,55,55,55,55,55,55,55,55,55,56,56,57,57,68,68,70,70,72,72,72,72,72,72,75,75,79,79,79,80,80,80,81,81,81,86,86,88,88,96,96,98};
+	public static final int[] JTE_LINE_INFO = {0,0,1,2,3,4,6,6,6,13,13,13,19,19,22,23,25,43,43,44,44,45,45,45,45,45,45,45,45,45,45,45,45,46,46,47,47,54,54,55,55,56,56,56,56,56,56,56,56,56,56,56,56,57,57,58,58,69,69,71,71,73,73,73,73,73,73,76,76,80,80,80,81,81,81,82,82,82,87,87,89,89,97,97,99};
 	public static void render(gg.jte.html.HtmlTemplateOutput jteOutput, gg.jte.html.HtmlInterceptor jteHtmlInterceptor, Usuario user, ReservaInfo reservaInfo, ListarCatrgoriaMetodo metodo) {
 		jteOutput.writeContent("\n\n<!doctype html>\n<html lang=\"en\">\n");
 		gg.jte.generated.ondemand.partes.JteheadGenerated.render(jteOutput, jteHtmlInterceptor);
@@ -71,7 +72,7 @@ public final class JtereservacionGenerated {
 				jteOutput.writeUserContent(metodo.info().reserva());
 				jteOutput.writeContent(" </p>\n                             <p> Precio (en USD):");
 				jteOutput.setContext("p", null);
-				jteOutput.writeUserContent(metodo.info().valor());
+				jteOutput.writeUserContent(new DecimalFormat("#,###.00").format(metodo.info().valor()));
 				jteOutput.writeContent(" </p>\n                             <p> Número de habitación: ");
 				jteOutput.setContext("p", null);
 				jteOutput.writeUserContent(metodo.info().habitacion());
