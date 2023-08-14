@@ -31,6 +31,8 @@ public class CookieController
     private final ClienteRepository clienteService;
     @Getter
     private static String dinUsusario;
+    @Getter
+    private static Usuario myUsuario;
 
     public CookieController(Javalin javalin, Injector injector)
     {
@@ -76,8 +78,10 @@ public class CookieController
             Optional<Usuario> usuario = loginService.ingresoSistema(new ConseguirUsuario(username,password));
             usuario.ifPresentOrElse(
                     (user) -> {
-                        context.render("index.jte", Collections.singletonMap("user",user));
                         setSessionCookie(context,user.getDni());
+                        myUsuario = user;
+                        context.render("index.jte", Collections.singletonMap("user",user));
+
                      },
                     () -> { context.render("login.jte",Collections.singletonMap("response",response));}
                     );
@@ -112,38 +116,39 @@ public class CookieController
 
     private void registarUsuario(Context context)
     {
-        String dni = context.formParam("dni");
-        String nombre = context.formParam("nombre");
-        String apellido = context.formParam("apellido");
-        LocalDate fechaNacimiento = LocalDate.parse(Objects.requireNonNull(context.formParam("fechaNacimiento")));
-        String username = context.formParam("username");
-        String password = context.formParam("password");
-        String password2 = context.formParam("password2");
-
+        this.response = null;
 
         try {
-            if (!dni.matches("^[0-9A-Za-z]+$") || !nombre.matches("^[0-9A-Za-z ]+$") ||
-                    !apellido.matches("^[0-9A-Za-z ]+$") || !username.matches("^[0-9A-Za-z]+$")) {
-                this.response = new ErrorResponse(400, "Campos llevan caracteres especiales");
-                context.render("formulario.jte", Collections.singletonMap("response", response));
-            }
+            String dni = context.formParam("dni");
+            String nombre = context.formParam("nombre");
+            String apellido = context.formParam("apellido");
+            LocalDate fechaNacimiento = LocalDate.parse(Objects.requireNonNull(context.formParam("fechaNacimiento")));
+            String username = context.formParam("username");
+            String password = context.formParam("password");
+            String password2 = context.formParam("password2");
             int edad = Period.between(fechaNacimiento, LocalDate.now()).getYears();
-            if (edad <= 17) {
-                this.response = new ErrorResponse(400, "Eres menor de edad");
-                context.render("formulario.jte", Collections.singletonMap("response", response));
+
+            if (!dni.matches("^[0-9A-Za-z]+$") || !nombre.matches("^[0-9A-Za-z ]+$") ||
+                !apellido.matches("^[0-9A-Za-z ]+$") || !username.matches("^[0-9A-Za-z]+$"))
+                {this.response = new ErrorResponse(400, "Campos llevan caracteres especiales");}
+
+            else if (edad <= 17)
+                {this.response = new ErrorResponse(400, "Eres menor de edad");}
+
+            else if (!password.equals(password2))
+                 {this.response = new ErrorResponse(400, "Contraseña no coinciden");}
+            else
+            {
+                Usuario usuario = new Usuario(dni,nombre,apellido,fechaNacimiento," ");
+                clienteService.guardarUsuarioLogin(usuario,new Login(username,password,usuario));
+                context.redirect("/");
             }
+            context.render("formulario.jte",Collections.singletonMap("response",response));
 
-            if (!password.equals(password2)) {
-                this.response = new ErrorResponse(400, "Contraseña no coinciden");
-                context.render("formulario.jte", Collections.singletonMap("response", response));
-            }
-
-            Usuario usuario = new Usuario(dni,nombre,apellido,fechaNacimiento," ");
-            clienteService.guardarUsuarioLogin(usuario,new Login(username,password,usuario));
-
-
-        }catch (Exception ex) { this.response = new ErrorResponse(400,ex.getMessage());
-                               context.render("formulario.jte", Collections.singletonMap("response", response));}
+        }catch (Exception ex)
+               { this.response = new ErrorResponse(400,ex.getMessage());
+                   context.render("formulario.jte",Collections.singletonMap("response",response));
+               }
 
 
 
@@ -165,7 +170,7 @@ public class CookieController
             return coockie != null && !coockie.isEmpty();
         }
 
-        public String getSessionCookie(Context context)
+        private String getSessionCookie(Context context)
         {
             return context.cookie("dni");
         }

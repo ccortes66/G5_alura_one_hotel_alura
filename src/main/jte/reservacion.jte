@@ -1,7 +1,7 @@
 @import com.alura.hotelalura.model.Usuario
 @import com.alura.hotelalura.repository.dto.ReservaInfo
 @import com.alura.hotelalura.ssr.dto.ListarCatrgoriaMetodo
-
+@import com.alura.hotelalura.ssr.CookieController
 
 @param Usuario user
 @param ReservaInfo reservaInfo
@@ -20,8 +20,10 @@
 
              <div class="col-sm p-3 min-vh-100">
                  <!-- content -->
-                 <h2><i class="bi-card-list fs-1"></i>  Generar Reservación</h2>
-                 <hr />
+                 @template.partes.titulos(CookieController.getMyUsuario(),
+                                          "Generar Reservación",
+                                           "bi-card-list fs-1")
+
                  <form action="/generar/reservacion" method="post">
                   <div class="row g-3">
 

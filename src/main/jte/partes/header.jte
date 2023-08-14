@@ -15,11 +15,6 @@
         <div class="d-flex " role="search">
             <p class="me-2">Bienvenido</p>
             <p class="text-capitalize me-3">${user.getNombre()} </p>
-
-                <a  href="/cerrar" class="btn btn-outline-danger" style="border-radius:50%; ">
-                                                  <i class="fa-solid fa-power-off "></i>
-                </a>
-
         </div>
     </div>
 </nav>

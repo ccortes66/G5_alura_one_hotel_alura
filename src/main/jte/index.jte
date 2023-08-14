@@ -2,8 +2,8 @@
 @import com.alura.hotelalura.repository.dto.ReservaInfo
 @import java.text.DecimalFormat
 @import java.util.List
+@import com.alura.hotelalura.ssr.CookieController
 
-@param Usuario user
 @param List<ReservaInfo> infoList
 
 <!doctype html>
@@ -18,8 +18,10 @@
 
              <div class="col-sm p-3 min-vh-100">
                  <!-- content -->
-                 <h2>Mis reservaciones</h2>
-                 <hr />
+                 @template.partes.titulos(CookieController.getMyUsuario(),
+                                          "Mis reservaciones",
+                                          "bi-arrow-repeat fs-1")
+
                  <table class="table">
                      <thead class="thead-dark">
                      <tr>

@@ -1,6 +1,6 @@
 @import com.alura.hotelalura.ssr.error.ErrorResponse
-
 @param ErrorResponse response
+
 <!doctype html>
 <html lang="en">
 @template.partes.head()

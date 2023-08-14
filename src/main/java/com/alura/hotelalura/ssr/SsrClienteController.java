@@ -28,12 +28,13 @@ public class SsrClienteController
 {
     private final Javalin javalin;
     private final Injector injector;
-    private ErrorResponse response;
+    private ErrorResponse response = null;
     private final ReservaRepository reservaService;
     private final MetodoDePagoRepository metodoDePagoService;
     private final HabitacionTipoRepository habitacionTipoService;
     private ListarCatrgoriaMetodo metodo;
     private ReservaInfoSsr infoSsr = null;
+    private ReservaInfo reservaInfo = null;
     private final ClienteRepository clienteService;
     private final HabitacionRepository habitacionService;
 
@@ -78,6 +79,10 @@ public class SsrClienteController
             context.render("reservacion.jte",Collections.singletonMap("metodo",metodo));
         });
 
+        javalin.get("/buscar/reservacion",context -> {
+                   context.render("buscar.jte",Collections.singletonMap("reservaInfo",reservaInfo));
+        });
+
 
         javalin.post("/generar/reservacion",this::generarReservacion);
 
@@ -86,45 +91,25 @@ public class SsrClienteController
 
     private void generarReservacion(Context context)
     {
-        this.response = null;
-        this.infoSsr = null;
 
-        LocalDate checkIn = LocalDate.parse(context.formParam("checkIn"));
-        LocalDate checkOut = LocalDate.parse(context.formParam("checkOut"));
-        String categoria = context.formParam("categoria");
-        String metodoPago = context.formParam("metodoPago");
-
-        LocalDate inicio = checkIn.atStartOfDay().toLocalDate();
-        LocalDate fin = checkOut.atStartOfDay().toLocalDate();
-
-        if(inicio.isEqual(fin))
+        try
         {
-            metodo = new ListarCatrgoriaMetodo(metodoDePagoService.listar(),
-                                               habitacionTipoService.listar(),
-                                               new ErrorResponse(400,"Las Fechas son iguales"),
-                                               infoSsr);
+            LocalDate checkIn = LocalDate.parse(context.formParam("checkIn"));
+            LocalDate checkOut = LocalDate.parse(context.formParam("checkOut"));
+            String categoria = context.formParam("categoria");
+            String metodoPago = context.formParam("metodoPago");
 
-            context.render("reservacion.jte",Collections.singletonMap("metodo",metodo));
-        }
 
-        else if(checkIn.isBefore(LocalDate.now()) || checkOut.isBefore(LocalDate.now()) ||
-            checkIn.isAfter(checkOut))
-        {
-             metodo = new ListarCatrgoriaMetodo(metodoDePagoService.listar(),
-                                                habitacionTipoService.listar(),
-                                                new  ErrorResponse(400,"Las fechas pertenecen al día o días anteriores"),
-                                                infoSsr);
-
-            context.render("reservacion.jte",Collections.singletonMap("metodo",metodo));
-        }else
-        {
-            try
-            {
-
+            if(checkIn.isEqual(checkOut))
+              { this.response =  new ErrorResponse(400,"Las Fechas son iguales");}
+            else if(checkIn.isBefore(LocalDate.now()) || checkOut.isBefore(LocalDate.now()) || checkIn.isAfter(checkOut))
+              { this.response =  new  ErrorResponse(400,"Las fechas pertenecen al día o días anteriores"); }
+            else
+              {
                 Cliente cliente = clienteService.buscar(CookieController.getDinUsusario());
                 Reserva reserva = new Reserva(cliente,checkIn,checkOut);
                 reserva.setMetodoPago(metodoDePagoService.buscar(metodoPago));
-                reserva.setValorReserva(habitacionTipoService.consultarPrecioHabitacion(new RegistrarReserva(checkIn,checkOut,categoria,metodoPago)));
+                reserva.setValorReserva(habitacionTipoService.consultarPrecioHabitacion(checkIn,checkOut,categoria));
 
                 Habitacion habitacion = habitacionService.asignarHabitacion(categoria);
                 habitacionService.guardarHabitacionPorReseva(habitacion);
@@ -133,32 +118,19 @@ public class SsrClienteController
                 reservaService.generar(reserva);
 
                 this.infoSsr  = reservaService.buscarResultado(CookieController.getDinUsusario());
-                System.out.println(infoSsr);
-                metodo = new ListarCatrgoriaMetodo(metodoDePagoService.listar(),
-                                                   habitacionTipoService.listar(),
-                                                   new ErrorResponse(200,"0k"),
-                                                   this.infoSsr
-                                                  );
-
-                context.render("reservacion.jte",Collections.singletonMap("metodo",metodo));
-
-
-
-            }catch (Exception ex){
-                metodo = new ListarCatrgoriaMetodo(metodoDePagoService.listar(),
-                                                   habitacionTipoService.listar(),
-                                                   new ErrorResponse(500,ex.getMessage()),
-                                                    infoSsr);
-                context.render("reservacion.jte",Collections.singletonMap("metodo",metodo));
+                this.response = new  ErrorResponse(200,"ok");
             }
+        }catch (Exception ex)
+                {this.response = new ErrorResponse(500,ex.getMessage());}
 
+        System.out.println(this);
+         metodo = new ListarCatrgoriaMetodo(metodoDePagoService.listar(),
+                                            habitacionTipoService.listar(),
+                                            this.response,
+                                            this.infoSsr
+                                             );
 
-
-
-
-
-        }
-
+         context.render("reservacion.jte",Collections.singletonMap("metodo",metodo));
 
     }
 }

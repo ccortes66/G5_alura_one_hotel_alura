@@ -1,6 +1,7 @@
 package com.alura.hotelalura.service;
 
 import com.alura.hotelalura.model.Cliente;
+import com.alura.hotelalura.model.Habitacion;
 import com.alura.hotelalura.model.Reserva;
 import com.alura.hotelalura.repository.dto.ReservaInfo;
 import com.alura.hotelalura.repository.dto.ReservaInfoEmpleados;
@@ -9,8 +10,11 @@ import com.alura.hotelalura.repository.persistence.ReservaRepository;
 import com.google.inject.Inject;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +51,17 @@ public class ReservaService implements ReservaRepository
         entityManager.getTransaction().begin();
         try
         {
-            entityManager.remove(this.buscar(codigo));
+            Reserva reserva = this.buscar(codigo);
+            reserva.getHabitacion().setReservado(false);
+
+            reserva.getCliente().setPuntos(this.eliminarPuntos(reserva.getHabitacion().getTipo().getPuntoUnitario(),
+                                                               reserva.getCliente().getPuntos()
+                                                               )
+                                           );
+
+            entityManager.merge(reserva);
+            entityManager.remove(reserva);
+
             entityManager.flush();
             entityManager.getTransaction().commit();
             entityManager.clear();
@@ -65,6 +79,10 @@ public class ReservaService implements ReservaRepository
         entityManager.getTransaction().begin();
         try
           {
+              reserva.getCliente().setPuntos(this.asignarPuntos(reserva.getHabitacion().getTipo().getPuntoUnitario(),
+                                                                reserva.getCliente().getPuntos()
+                                                                )
+                                             );
               entityManager.merge(reserva);
               entityManager.flush();
               entityManager.getTransaction().commit();
@@ -120,11 +138,20 @@ public class ReservaService implements ReservaRepository
     public List<ReservaInfo> listarReservaPorCliente(String dni) {
         jpql = "SELECT NEW com.alura.hotelalura.repository.dto.ReservaInfo(RS.reserva,RS.checkIn,RS.checkOut,RS.valorReserva,RS.habitacion.tipo.nombre,RS.habitacion.numero) "+
                 "FROM Reserva RS " +
-                "WHERE RS.cliente.usuario.dni = :dni ";
+                "WHERE RS.cliente.usuario.dni = :dni " +
+                "ORDER BY RS.id DESC ";
+
         TypedQuery<ReservaInfo> query = entityManager.createQuery(jpql, ReservaInfo.class);
         query.setParameter("dni",dni.trim());
+        query.setMaxResults(15);
         return query.getResultList();
     }
+
+    private Integer asignarPuntos(Integer puntos, Integer puntosCliente)
+    {return puntos + puntosCliente;}
+
+    private Integer eliminarPuntos(Integer puntos, Integer puntosCliente)
+    {return puntosCliente - puntos;}
 
 
 

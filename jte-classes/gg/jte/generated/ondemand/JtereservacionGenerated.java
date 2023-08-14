@@ -2,16 +2,19 @@ package gg.jte.generated.ondemand;
 import com.alura.hotelalura.model.Usuario;
 import com.alura.hotelalura.repository.dto.ReservaInfo;
 import com.alura.hotelalura.ssr.dto.ListarCatrgoriaMetodo;
+import com.alura.hotelalura.ssr.CookieController;
 public final class JtereservacionGenerated {
 	public static final String JTE_NAME = "reservacion.jte";
-	public static final int[] JTE_LINE_INFO = {0,0,1,2,5,5,5,12,12,12,18,18,21,40,40,41,41,42,42,42,42,42,42,42,42,42,42,42,42,43,43,44,44,51,51,52,52,53,53,53,53,53,53,53,53,53,53,53,53,54,54,55,55,66,66,68,68,70,70,70,70,70,70,73,73,77,77,77,78,78,78,79,79,79,84,84,86,86,94,94,96};
+	public static final int[] JTE_LINE_INFO = {0,0,1,2,3,5,5,5,12,12,12,18,18,21,22,24,42,42,43,43,44,44,44,44,44,44,44,44,44,44,44,44,45,45,46,46,53,53,54,54,55,55,55,55,55,55,55,55,55,55,55,55,56,56,57,57,68,68,70,70,72,72,72,72,72,72,75,75,79,79,79,80,80,80,81,81,81,86,86,88,88,96,96,98};
 	public static void render(gg.jte.html.HtmlTemplateOutput jteOutput, gg.jte.html.HtmlInterceptor jteHtmlInterceptor, Usuario user, ReservaInfo reservaInfo, ListarCatrgoriaMetodo metodo) {
 		jteOutput.writeContent("\n\n<!doctype html>\n<html lang=\"en\">\n");
 		gg.jte.generated.ondemand.partes.JteheadGenerated.render(jteOutput, jteHtmlInterceptor);
 		jteOutput.writeContent("\n<body>\n\n    \n    <section class=\"container-fluid\">\n         <div class=\"row\">\n             ");
 		gg.jte.generated.ondemand.partes.JtesiderbarGenerated.render(jteOutput, jteHtmlInterceptor);
 		jteOutput.writeContent("\n\n             <div class=\"col-sm p-3 min-vh-100\">\n                 ");
-		jteOutput.writeContent("\n                 <h2><i class=\"bi-card-list fs-1\"></i>  Generar Reservación</h2>\n                 <hr />\n                 <form action=\"/generar/reservacion\" method=\"post\">\n                  <div class=\"row g-3\">\n\n                     <div class=\"col-auto\">\n                         <label for=\"checkOut\" class=\"form-label\">Check In</label>\n                         <input type=\"date\" class=\"form-control\" name=\"checkIn\" required  aria-label=\"First name\">\n                     </div>\n\n                     <div class=\"col-auto\">\n                         <label for=\"checkOut\" class=\"form-label\">Check Out</label>\n                         <input type=\"date\" class=\"form-control\" id=\"checkOut\" name=\"checkOut\" required aria-label=\"Last name\">\n                     </div>\n\n                     <div class=\"col-auto\">\n                         <label for=\"categoria\" class=\"form-label\">Categoría</label>\n                         <select class=\"form-select\" id=\"categoria\" name=\"categoria\" aria-label=\"Default select example\" required>\n                             ");
+		jteOutput.writeContent("\n                 ");
+		gg.jte.generated.ondemand.partes.JtetitulosGenerated.render(jteOutput, jteHtmlInterceptor, CookieController.getMyUsuario(), "Generar Reservación", "bi-card-list fs-1");
+		jteOutput.writeContent("\n\n                 <form action=\"/generar/reservacion\" method=\"post\">\n                  <div class=\"row g-3\">\n\n                     <div class=\"col-auto\">\n                         <label for=\"checkOut\" class=\"form-label\">Check In</label>\n                         <input type=\"date\" class=\"form-control\" name=\"checkIn\" required  aria-label=\"First name\">\n                     </div>\n\n                     <div class=\"col-auto\">\n                         <label for=\"checkOut\" class=\"form-label\">Check Out</label>\n                         <input type=\"date\" class=\"form-control\" id=\"checkOut\" name=\"checkOut\" required aria-label=\"Last name\">\n                     </div>\n\n                     <div class=\"col-auto\">\n                         <label for=\"categoria\" class=\"form-label\">Categoría</label>\n                         <select class=\"form-select\" id=\"categoria\" name=\"categoria\" aria-label=\"Default select example\" required>\n                             ");
 		if (metodo.habitacionTipo() != null) {
 			jteOutput.writeContent("\n                                 ");
 			for (var categoria: metodo.habitacionTipo()) {
