@@ -2,7 +2,7 @@ package gg.jte.generated.ondemand;
 import com.alura.hotelalura.ssr.error.ErrorResponse;
 public final class JteloginGenerated {
 	public static final String JTE_NAME = "login.jte";
-	public static final int[] JTE_LINE_INFO = {0,0,1,1,1,5,5,5,19,19,21,21,21,21,21,21,24,24,29,35,42,53,53,56};
+	public static final int[] JTE_LINE_INFO = {0,0,1,1,1,5,5,5,19,19,21,21,21,21,21,21,24,24,29,35,41,44,55,55,58};
 	public static void render(gg.jte.html.HtmlTemplateOutput jteOutput, gg.jte.html.HtmlInterceptor jteHtmlInterceptor, ErrorResponse response) {
 		jteOutput.writeContent("\n<!doctype html>\n<html lang=\"en\">\n");
 		gg.jte.generated.ondemand.partes.JteheadGenerated.render(jteOutput, jteHtmlInterceptor);
@@ -18,7 +18,8 @@ public final class JteloginGenerated {
 		}
 		jteOutput.writeContent("\n\n                    <div class=\"divider d-flex align-items-center my-4\">\n                        <p class=\"text-center fw-bold mx-3 mb-0 text-muted\">Login</p>\n                    </div>\n                    ");
 		jteOutput.writeContent("\n                    <div class=\"form-outline mb-4\">\n                        <input type=\"text\" id=\"username\"  name=\"username\" class=\"form-control form-control-lg\" required />\n                        <label class=\"form-label\" for=\"username\" >Username</label>\n                    </div>\n\n                    ");
-		jteOutput.writeContent("\n                    <div class=\"form-outline mb-4\">\n                        <input type=\"password\" id=\"password\" name=\"password\" class=\"form-control form-control-lg\" required />\n                        <label class=\"form-label\" for=\"password\" >Password</label>\n                    </div>\n\n\n                    ");
+		jteOutput.writeContent("\n                    <div class=\"form-outline mb-4\">\n                        <input type=\"password\" id=\"password\" name=\"password\" class=\"form-control form-control-lg\" required />\n                        <label class=\"form-label\" for=\"password\" >Password</label>\n                    </div>\n\n                    ");
+		jteOutput.writeContent("\n                    <div class=\"form-outline mb-4  h-captcha\" data-sitekey=\"fd57c86b-3201-4b83-af0a-12f67c8fe5a1\"></div>\n\n                    ");
 		jteOutput.writeContent("\n                    <button type=\"submit\" class=\"btn btn-outline-success btn-lg btn-block mb-2\" style=\"width:100%\">Ingresar</button>\n                    <a href=\"/registrar\" class=\"btn btn-outline-primary btn-lg btn-block\" style=\"width:100%\">Registar</a>\n\n                </form>\n            </div>\n        </div>\n    </div>\n</section>\n\n\n");
 		gg.jte.generated.ondemand.partes.JtefooterGenerated.render(jteOutput, jteHtmlInterceptor);
 		jteOutput.writeContent("\n\n</body>\n</html>");

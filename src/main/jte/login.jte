@@ -39,6 +39,8 @@
                         <label class="form-label" for="password" >Password</label>
                     </div>
 
+                    <!-- captcha -->
+                    <div class="form-outline mb-4  h-captcha" data-sitekey="fd57c86b-3201-4b83-af0a-12f67c8fe5a1"></div>
 
                     <!-- Submit button -->
                     <button type="submit" class="btn btn-outline-success btn-lg btn-block mb-2" style="width:100%">Ingresar</button>

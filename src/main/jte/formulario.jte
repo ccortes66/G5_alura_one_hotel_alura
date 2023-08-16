@@ -83,8 +83,10 @@
                                         </div>
                                     </div>
 
-
-
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-key-non fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline mb-4  h-captcha" data-sitekey="fd57c86b-3201-4b83-af0a-12f67c8fe5a1"></div>
+                                    </div>
 
                                     <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                                         <input type="submit" class="btn btn-outline-success btn-lg" value="Registrar">

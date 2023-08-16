@@ -8,18 +8,24 @@ import com.alura.hotelalura.repository.persistence.LoginRepository;
 import com.alura.hotelalura.service.ClienteService;
 import com.alura.hotelalura.service.LoginService;
 import com.alura.hotelalura.ssr.error.ErrorResponse;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import lombok.Getter;
+import org.eclipse.jetty.server.HttpConnection;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CookieController
 {
@@ -29,6 +35,7 @@ public class CookieController
     private ErrorResponse response;
     private final LoginRepository loginService;
     private final ClienteRepository clienteService;
+    private static ObjectMapper mapper = new ObjectMapper();
     @Getter
     private static String dinUsusario;
     @Getter
@@ -75,16 +82,19 @@ public class CookieController
 
         try
         {
-            Optional<Usuario> usuario = loginService.ingresoSistema(new ConseguirUsuario(username,password));
-            usuario.ifPresentOrElse(
-                    (user) -> {
-                        setSessionCookie(context,user.getDni());
-                        myUsuario = user;
-                        context.render("index.jte", Collections.singletonMap("user",user));
+            if(verifyCapcha(context))
+            {
+                Optional<Usuario> usuario = loginService.ingresoSistema(new ConseguirUsuario(username,password));
+                usuario.ifPresentOrElse(
+                        (user) -> {
+                            setSessionCookie(context,user.getDni());
+                            myUsuario = user;
+                            context.render("index.jte", Collections.singletonMap("user",user));
+                        },
+                        () ->  context.render("login.jte",Collections.singletonMap("response",response))
+                );
+            }
 
-                     },
-                    () -> { context.render("login.jte",Collections.singletonMap("response",response));}
-                    );
         } catch (Exception ex)
            {context.render("login.jte",Collections.singletonMap("response",response));}
 
@@ -113,6 +123,31 @@ public class CookieController
         context.removeCookie("dni");
         context.redirect("/");
     }
+
+    private static boolean verifyCapcha(Context context) throws IOException
+    {
+
+        Map<String,String> params = new HashMap<>();
+        params.put("response",context.formParam("h-captcha-response"));
+        params.put("secret",System.getenv("secret"));
+
+
+
+        URL url = new URL("https://hcaptcha.com/siteverify");
+        HttpURLConnection connection =  (HttpURLConnection)  url.openConnection();
+
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+
+        String posData = params.entrySet().stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.joining("&"));
+
+        connection.getOutputStream().write(posData.getBytes());
+        JsonNode responseJson = mapper.readTree(connection.getInputStream());
+
+        return responseJson.get("success").asBoolean();
+    };
 
     private void registarUsuario(Context context)
     {
@@ -160,6 +195,7 @@ public class CookieController
         @Override
         public void handle(@NotNull Context context) throws Exception
         {
+
             if(!isValidCookie(context) && !context.path().equals("/registrar"))
               {context.render("login.jte");}
         }

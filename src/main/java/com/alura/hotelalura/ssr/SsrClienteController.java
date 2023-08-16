@@ -13,6 +13,7 @@ import com.alura.hotelalura.service.ClienteService;
 import com.alura.hotelalura.service.HabitacionService;
 import com.alura.hotelalura.service.ReservaService;
 import com.alura.hotelalura.service.type.HabitacionTipoService;
+import com.alura.hotelalura.ssr.dto.ConsultaInfoReservacion;
 import com.alura.hotelalura.ssr.dto.ListarBusqueda;
 import com.alura.hotelalura.ssr.dto.ListarCatrgoriaMetodo;
 import com.alura.hotelalura.ssr.error.ErrorResponse;
@@ -20,6 +21,8 @@ import com.google.inject.Injector;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +43,7 @@ public class SsrClienteController
     private final ClienteRepository clienteService;
     private final HabitacionRepository habitacionService;
     private List<ReservaInfo> infoList;
-
+    private ConsultaInfoReservacion reservacion = null;
     private ListarBusqueda busqueda;
 
 
@@ -63,6 +66,7 @@ public class SsrClienteController
         javalin.after("/listar/reservaciones",new CookieController.MiddewareCookie());
         javalin.after("/generar/reservacion",new CookieController.MiddewareCookie());
         javalin.after("/buscar/reservacion",new CookieController.MiddewareCookie());
+        javalin.after("/consultar/reservacion",new CookieController.MiddewareCookie());
         javalin.after("/busqueda",new CookieController.MiddewareCookie());
     }
 
@@ -107,8 +111,21 @@ public class SsrClienteController
             context.render("buscar.jte",Collections.singletonMap("busqueda",busqueda));
         });
 
+        javalin.get("/consultar/reservacion",context -> {
+            ConsultaInfoReservacion reservacion = new ConsultaInfoReservacion(
+                                                                    habitacionTipoService.listar(),
+                                                                     null,
+                                                                    null);
+            context.render("consultar.jte",Collections.singletonMap("reservacion",reservacion));
+
+        });
+
 
         javalin.post("/generar/reservacion",this::generarReservacion);
+        javalin.post("/consultar/reservacion",this::consultarPrecio);
+
+
+
 
 
 
@@ -148,7 +165,6 @@ public class SsrClienteController
         }catch (Exception ex)
                 {this.response = new ErrorResponse(500,ex.getMessage());}
 
-        System.out.println(this);
          metodo = new ListarCatrgoriaMetodo(metodoDePagoService.listar(),
                                             habitacionTipoService.listar(),
                                             this.response,
@@ -156,6 +172,41 @@ public class SsrClienteController
                                              );
 
          context.render("reservacion.jte",Collections.singletonMap("metodo",metodo));
+
+    }
+
+    private void consultarPrecio(Context context)
+    {
+        BigDecimal resultadoPrecio = null;
+        this.reservacion = null;
+        this.response = null;
+        RegistrarReserva registrarReserva = null;
+
+        try
+        {
+
+            LocalDate checkIn = LocalDate.parse(context.formParam("checkIn"));
+            LocalDate checkOut = LocalDate.parse(context.formParam("checkOut"));
+            String categoria = context.formParam("categoria");
+
+
+            if(checkIn.isEqual(checkOut))
+            { this.response =  new ErrorResponse(400,"Las Fechas son iguales");}
+            else if(checkIn.isBefore(LocalDate.now()) || checkOut.isBefore(LocalDate.now()) || checkIn.isAfter(checkOut))
+            { this.response =  new  ErrorResponse(400,"Las fechas pertenecen al día o días anteriores"); }
+            else
+            { resultadoPrecio = habitacionTipoService.consultarPrecioHabitacion(checkIn,checkOut,categoria); }
+              registrarReserva = new RegistrarReserva(checkIn,
+                                                      checkOut,
+                                                      categoria,
+                                                      new DecimalFormat("#,###.00").format( (resultadoPrecio == null) ? 0 : resultadoPrecio ));
+        } catch (Exception ex)
+                 {this.response =  new  ErrorResponse(500,ex.getMessage());}
+
+         this.reservacion = new ConsultaInfoReservacion(habitacionTipoService.listar(),
+                                                        this.response,
+                                                        registrarReserva);
+         context.render("consultar.jte",Collections.singletonMap("reservacion",reservacion));
 
     }
 }

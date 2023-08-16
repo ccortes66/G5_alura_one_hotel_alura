@@ -20,7 +20,7 @@ public final class JtetitulosGenerated {
 		jteOutput.writeContent("\n            ");
 		jteOutput.setContext("h2", null);
 		jteOutput.writeUserContent(titulo);
-		jteOutput.writeContent("\n        </h2>\n\n        <p class=\"text-capitalize mt-3\">\n            Bienvenido ");
+		jteOutput.writeContent("\n        </h2>\n\n        <p class=\"text-capitalize mt-2\">\n            <i class=\"bi-person-circle h2 \"></i> ");
 		jteOutput.setContext("p", null);
 		jteOutput.writeUserContent(user.getNombre());
 		jteOutput.writeContent("\n        </p>\n    </div>\n<hr/>\n\n");

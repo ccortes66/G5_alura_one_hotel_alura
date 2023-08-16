@@ -13,8 +13,8 @@
             ${titulo}
         </h2>
 
-        <p class="text-capitalize mt-3">
-            Bienvenido ${user.getNombre()}
+        <p class="text-capitalize mt-2">
+            <i class="bi-person-circle h2 "></i> ${user.getNombre()}
         </p>
     </div>
 <hr/>
