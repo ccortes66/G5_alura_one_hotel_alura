@@ -3,6 +3,7 @@ package com.alura.hotelalura.ssr;
 import com.alura.hotelalura.model.Cliente;
 import com.alura.hotelalura.model.Habitacion;
 import com.alura.hotelalura.model.Reserva;
+import com.alura.hotelalura.model.Usuario;
 import com.alura.hotelalura.model.type.HabitacionTipo;
 import com.alura.hotelalura.model.type.MetodoPago;
 import com.alura.hotelalura.repository.dto.RegistrarReserva;
@@ -17,17 +18,20 @@ import com.alura.hotelalura.ssr.dto.ConsultaInfoReservacion;
 import com.alura.hotelalura.ssr.dto.ListarBusqueda;
 import com.alura.hotelalura.ssr.dto.ListarCatrgoriaMetodo;
 import com.alura.hotelalura.ssr.error.ErrorResponse;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class SsrClienteController
 {
@@ -43,8 +47,14 @@ public class SsrClienteController
     private final ClienteRepository clienteService;
     private final HabitacionRepository habitacionService;
     private List<ReservaInfo> infoList;
+
+    @Getter
+    private static TreeSet<String> mysPaises = new TreeSet<>();
     private ConsultaInfoReservacion reservacion = null;
     private ListarBusqueda busqueda;
+
+    private ObjectMapper mapper;
+
 
 
     public SsrClienteController(Javalin javalin, Injector injector)
@@ -56,6 +66,7 @@ public class SsrClienteController
         this.habitacionTipoService = injector.getInstance(HabitacionTipoService.class);
         this.clienteService = injector.getInstance(ClienteRepository.class);
         this.habitacionService = injector.getInstance(HabitacionService.class);
+        this.mapper = new ObjectMapper();
 
         cargarMiddleware();
         cargarEvento();
@@ -68,6 +79,8 @@ public class SsrClienteController
         javalin.after("/buscar/reservacion",new CookieController.MiddewareCookie());
         javalin.after("/consultar/reservacion",new CookieController.MiddewareCookie());
         javalin.after("/busqueda",new CookieController.MiddewareCookie());
+        javalin.after("/perfil",new CookieController.MiddewareCookie());
+        javalin.after("/eliminar",new CookieController.MiddewareCookie());
     }
 
     private void cargarEvento()
@@ -120,12 +133,40 @@ public class SsrClienteController
 
         });
 
+        javalin.get("/perfil",context -> {
+
+              OkHttpClient client = new OkHttpClient();
+              Request request = new Request.Builder()
+                                               .url("https://restcountries.com/v3.1/all")
+                                               .build();
+
+              Response responses = client.newCall(request).execute();
+              String responseBody = responses.body().string();
+              JsonNode paises = mapper.readTree(responseBody);
+
+              if(mysPaises.isEmpty())
+              {
+                  for (JsonNode pais: paises)
+                  {mysPaises.add(pais.get("name").get("common").asText());}
+
+              }
+              context.render("perfil.jte",Collections.singletonMap("mysPaises",mysPaises));
+
+        });
+
+        javalin.get("/eliminar",context -> {
+            Byte result = clienteService.eliminar(CookieController.getDinUsusario());
+            if(result>=1)
+            {context.render("login.jte");}
+            else
+             {context.render("perfil.jte");}
+
+        });
+
 
         javalin.post("/generar/reservacion",this::generarReservacion);
         javalin.post("/consultar/reservacion",this::consultarPrecio);
-
-
-
+        javalin.post("/perfil",this::editarCuenta);
 
 
 
@@ -208,5 +249,26 @@ public class SsrClienteController
                                                         registrarReserva);
          context.render("consultar.jte",Collections.singletonMap("reservacion",reservacion));
 
+    }
+
+    private void editarCuenta(Context context)
+    {
+        String telefono = context.formParam("telefono");
+
+        try
+        {
+              Optional <Cliente> cliente = Optional.ofNullable(clienteService.buscar(CookieController.getDinUsusario()));
+              cliente.ifPresent((client) -> {
+                  Usuario usuario = client.getUsuario();
+                  usuario.setTelefono(telefono);
+                  clienteService.modificar(usuario,client.getUsuario().getDni());
+                  CookieController.setIsCliente(client);
+              });
+
+        }catch (Exception ex)
+                {ex.printStackTrace();}
+
+
+        context.render("perfil.jte",Collections.singletonMap("mysPaises",mysPaises));
     }
 }

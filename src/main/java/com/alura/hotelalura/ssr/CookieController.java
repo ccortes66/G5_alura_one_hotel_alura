@@ -1,5 +1,6 @@
 package com.alura.hotelalura.ssr;
 
+import com.alura.hotelalura.model.Cliente;
 import com.alura.hotelalura.model.Login;
 import com.alura.hotelalura.model.Usuario;
 import com.alura.hotelalura.repository.dto.ConseguirUsuario;
@@ -15,12 +16,11 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import lombok.Getter;
-import org.eclipse.jetty.server.HttpConnection;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.Period;
@@ -40,6 +40,8 @@ public class CookieController
     private static String dinUsusario;
     @Getter
     private static Usuario myUsuario;
+    @Getter @Setter
+    private static Cliente isCliente = null;
 
     public CookieController(Javalin javalin, Injector injector)
     {
@@ -50,6 +52,8 @@ public class CookieController
         cargarHtml();
         eventosHtml();
     }
+
+
 
     private void cargarHtml()
     {
@@ -87,8 +91,10 @@ public class CookieController
                 Optional<Usuario> usuario = loginService.ingresoSistema(new ConseguirUsuario(username,password));
                 usuario.ifPresentOrElse(
                         (user) -> {
+                            Optional <Cliente> cliente = Optional.ofNullable(clienteService.buscar(user.getDni()));
                             setSessionCookie(context,user.getDni());
                             myUsuario = user;
+                            cliente.ifPresent(value -> isCliente = value);
                             context.render("index.jte", Collections.singletonMap("user",user));
                         },
                         () ->  context.render("login.jte",Collections.singletonMap("response",response))

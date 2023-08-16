@@ -23,7 +23,7 @@ public class Login
     @NonNull
     private String password;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @NonNull
     private Usuario usuario;
 

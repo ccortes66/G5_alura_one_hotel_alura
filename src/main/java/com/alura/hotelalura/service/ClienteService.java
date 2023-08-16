@@ -100,34 +100,20 @@ public class ClienteService implements ClienteRepository
     @Override
     public Byte eliminar(String codigo)
     {
-
         entityManager.getTransaction().begin();
         try
-        { jpql = "SELECT L FROM Login L "+
-                 "JOIN FETCH L.usuario usr "+
-                 "WHERE  usr.dni = :codigo";
+        {
+            Cliente cliente = this.buscar(codigo);
 
-            Login login = entityManager.createQuery(jpql,Login.class)
-                                                        .setParameter("codigo",codigo.trim())
-                                                        .getSingleResult();
-            entityManager.remove(login);
+            Query query = entityManager.createQuery("DELETE FROM Reserva RS WHERE RS.cliente = :cl");
+            query.setParameter("cl",cliente);
+            query.executeUpdate();
 
-            jpql = "SELECT c FROM Cliente c "+
-                    "JOIN FETCH c.usuario usr "+
-                    "WHERE usr.dni = :codigo";
+            query = entityManager.createQuery("DELETE FROM Login l WHERE l.usuario = :cl");
+            query.setParameter("cl",cliente.getUsuario());
+            query.executeUpdate();
 
-            Cliente cliente = entityManager.createQuery(jpql,Cliente.class)
-                                                                .setParameter("codigo",codigo.trim())
-                                                                .getSingleResult();
-            entityManager.remove(cliente);
-
-            jpql = "SELECT u FROM Usuario u "+
-                    "WHERE u.dni = :codigo";
-
-            Usuario usuario = entityManager.createQuery(jpql,Usuario.class)
-                                                                    .setParameter("codigo",codigo.trim())
-                                                                    .getSingleResult();
-            entityManager.remove(usuario);
+            entityManager.remove(cliente);;
 
             entityManager.flush();
             entityManager.getTransaction().commit();
@@ -136,6 +122,7 @@ public class ClienteService implements ClienteRepository
 
         }catch (Exception ex)
         {entityManager.getTransaction().rollback();
+            ex.printStackTrace();
             return 0;}
     }
 
