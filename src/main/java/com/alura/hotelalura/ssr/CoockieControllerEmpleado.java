@@ -1,17 +1,33 @@
 package com.alura.hotelalura.ssr;
 
+import com.alura.hotelalura.model.Empleado;
+import com.alura.hotelalura.model.Usuario;
+import com.alura.hotelalura.repository.dto.ConseguirUsuario;
 import com.alura.hotelalura.repository.persistence.EmpleadoRepository;
 import com.alura.hotelalura.repository.persistence.LoginRepository;
 import com.alura.hotelalura.service.EmpleadoService;
 import com.alura.hotelalura.service.LoginService;
+import com.alura.hotelalura.ssr.dto.ResultadoLista;
+import com.alura.hotelalura.ssr.dto.ResultadoListaEmpleado;
+import com.alura.hotelalura.ssr.error.ErrorResponse;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.RequestBody;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import io.javalin.http.Handler;
+import net.bytebuddy.utility.visitor.ContextClassVisitor;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class CoockieControllerEmpleado
 {
@@ -19,6 +35,9 @@ public class CoockieControllerEmpleado
     private final Injector injector;
     private final LoginRepository loginService;
     private final EmpleadoRepository empleadoService;
+    private ObjectMapper mapper;
+    private ErrorResponse response = null;
+
 
 
     public CoockieControllerEmpleado(Javalin javalin,Injector injector)
@@ -27,27 +46,95 @@ public class CoockieControllerEmpleado
         this.injector = injector;
         this.loginService = injector.getInstance(LoginService.class);
         this.empleadoService = injector.getInstance(EmpleadoService.class);
+        this.mapper = new ObjectMapper();
         cargarHtml();
     }
 
     private void cargarHtml()
     {
         javalin.before(context -> {
-            if(context.sessionAttribute("employer") == null && !context.path().equals("/registrar"))
+            if(!validEmpleado(context) && !context.path().equals("/empleado/registrar"))
                {context.render("employer/login.jte");}
         });
 
-        javalin.get("/",context -> context.render("employer/login.jte"));
+        javalin.get("/",context -> context.render("employer/login.jte",Collections.singletonMap("response",null)));
+        javalin.get("/cerrar",this::closedSession);
+        javalin.post("/empleado/autenticar",this::ingresoAlSystema);
     }
 
-    private boolean verificarCaptcha(Context context)
+    private void closedSession(Context context)
     {
+        context.sessionAttribute("empleado",null);
+        context.redirect("/");
+    }
+
+    private boolean validEmpleado(Context context)
+    {
+        Usuario user = context.sessionAttribute("empleado");
+        return  user != null;
+    }
+
+    private boolean verificarCaptcha(Context context) throws IOException {
         Map<String,String> params = new HashMap<>();
         params.put("response",context.formParam("h-captcha-response"));
         params.put("secret",System.getenv("secret"));
 
-        return false;
+        URL url = new URL("https://hcaptcha.com/siteverify");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+
+        String postData = params.entrySet().stream()
+                .map(param-> param.getKey() + "="+ param.getValue())
+                .collect(Collectors.joining("&"));
+
+        connection.getOutputStream().write(postData.getBytes());
+        JsonNode result = this.mapper.readTree(connection.getInputStream());
+
+
+        return result.get("success").asBoolean();
     }
+
+    private void ingresoAlSystema(Context context) throws IOException {
+
+        String username = context.formParam("username");
+        String password = context.formParam("password");
+        this.response = new ErrorResponse(400,"Usuario o contraseña errónea");
+
+        try
+          {
+
+              if(verificarCaptcha(context))
+              {
+                       Optional<Usuario> usuario = loginService.ingresoSistema(new ConseguirUsuario(username,password));
+                       usuario.ifPresentOrElse(
+                               (user) -> {
+                                   Optional<Empleado> empleado = Optional.ofNullable(empleadoService.buscar(user.getDni()));
+                                   empleado.ifPresent((emp)->{
+                                       context.sessionAttribute("empleado", user);
+                                       context.render("employer/index.jte", Collections.singletonMap("resultadoListaEmpleado", new ResultadoListaEmpleado(null, user)));
+                                   });
+
+                               },
+                               () -> context.render("employer/login.jte",Collections.singletonMap("response",response))
+                       );
+              }
+
+            }catch (Exception ex) {context.render("employer/login.jte",Collections.singletonMap("response",new ErrorResponse(500,ex.getMessage())));}
+
+    }
+    public static class MiddleareEmpleado implements Handler
+    {
+
+        @Override
+        public void handle(@NotNull Context context) throws Exception
+        {
+             Optional<Usuario> usuario = Optional.ofNullable(context.sessionAttribute("empleado"));
+            if(usuario.isEmpty() && !context.path().equals("/empleado/registrar"))
+               {context.render("employer/login.jte");}
+        }
+    }
+
 
 
 

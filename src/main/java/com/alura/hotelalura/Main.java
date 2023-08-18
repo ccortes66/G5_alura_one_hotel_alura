@@ -3,6 +3,7 @@ package com.alura.hotelalura;
 import com.alura.hotelalura.config.CDI;
 import com.alura.hotelalura.ssr.CoockieControllerEmpleado;
 import com.alura.hotelalura.ssr.CookieController;
+import com.alura.hotelalura.ssr.SSrEmpleadoController;
 import com.alura.hotelalura.ssr.SsrClienteController;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -35,6 +36,7 @@ public class Main
         //ssr empleado
         Javalin ssrEmpleados = Javalin.create().start(8083);
         new CoockieControllerEmpleado(ssrEmpleados,injector);
+        new SSrEmpleadoController(ssrEmpleados,injector);
 
 
     }

@@ -15,7 +15,7 @@
             </div>
 
             <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
-                <form action="/authetication" method="post">
+                <form action="/empleado/autenticar" method="post">
 
                     @if(response != null)
                         <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
@@ -44,7 +44,7 @@
 
                     <!-- Submit button -->
                     <button type="submit" class="btn btn-outline-success btn-lg btn-block mb-2" style="width:100%">Ingresar</button>
-                    <a href="/registrar" class="btn btn-outline-primary btn-lg btn-block" style="width:100%">Registar</a>
+
 
                 </form>
             </div>

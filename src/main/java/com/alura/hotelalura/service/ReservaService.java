@@ -124,8 +124,9 @@ public class ReservaService implements ReservaRepository
     {
         jpql = "SELECT NEW com.alura.hotelalura.repository.dto.ReservaInfoEmpleados("+
                 "RS.reserva,RS.checkIn,RS.checkOut,RS.habitacion.tipo.nombre,RS.habitacion.numero,RS.metodoPago.nombre," +
-                "RS.habitacion.reservado) "+
-                "FROM Reserva RS ";
+                "RS.habitacion.numero) "+
+                "FROM Reserva RS "+
+                "ORDER BY RS.checkIn ASC";
 
         TypedQuery<ReservaInfoEmpleados> query = entityManager.createQuery(jpql,ReservaInfoEmpleados.class);
         query.setFirstResult(skip);

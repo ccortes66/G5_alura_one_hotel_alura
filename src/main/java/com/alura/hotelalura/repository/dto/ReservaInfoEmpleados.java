@@ -9,6 +9,6 @@ public record ReservaInfoEmpleados(String reserva,
                                    String categoria,
                                    Integer habitacion,
                                    String metodoPago,
-                                   Boolean estado)
+                                   Integer numero)
 {
 }

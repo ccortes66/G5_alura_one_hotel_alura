@@ -59,6 +59,7 @@ public class CookieController
         javalin.get("/", context -> context.render("login.jte"));
         javalin.get("/registrar",context -> context.render("formulario.jte"));
 
+
     }
 
     private void eventosHtml()
@@ -107,6 +108,7 @@ public class CookieController
     private void closedSession(Context context)
     {
         context.sessionAttribute("user",null);
+        context.removeCookie("user");
         context.redirect("/");
     }
 
@@ -135,41 +137,44 @@ public class CookieController
         return responseJson.get("success").asBoolean();
     };
 
-    private void registarUsuario(Context context)
-    {
+    private void registarUsuario(Context context) throws IOException {
         this.response = null;
 
-        try {
-            String dni = context.formParam("dni");
-            String nombre = context.formParam("nombre");
-            String apellido = context.formParam("apellido");
-            LocalDate fechaNacimiento = LocalDate.parse(Objects.requireNonNull(context.formParam("fechaNacimiento")));
-            String username = context.formParam("username");
-            String password = context.formParam("password");
-            String password2 = context.formParam("password2");
-            int edad = Period.between(fechaNacimiento, LocalDate.now()).getYears();
+        if (verifyCapcha(context))
+        {
+            try {
+                String dni = context.formParam("dni");
+                String nombre = context.formParam("nombre");
+                String apellido = context.formParam("apellido");
+                LocalDate fechaNacimiento = LocalDate.parse(Objects.requireNonNull(context.formParam("fechaNacimiento")));
+                String username = context.formParam("username");
+                String password = context.formParam("password");
+                String password2 = context.formParam("password2");
+                int edad = Period.between(fechaNacimiento, LocalDate.now()).getYears();
 
-            if (!dni.matches("^[0-9A-Za-z]+$") || !nombre.matches("^[0-9A-Za-z ]+$") ||
-                !apellido.matches("^[0-9A-Za-z ]+$") || !username.matches("^[0-9A-Za-z]+$"))
+                if (!dni.matches("^[0-9A-Za-z]+$") || !nombre.matches("^[0-9A-Za-z ]+$") ||
+                        !apellido.matches("^[0-9A-Za-z ]+$") || !username.matches("^[0-9A-Za-z]+$"))
                 {this.response = new ErrorResponse(400, "Campos llevan caracteres especiales");}
 
-            else if (edad <= 17)
+                else if (edad <= 17)
                 {this.response = new ErrorResponse(400, "Eres menor de edad");}
 
-            else if (!password.equals(password2))
-                 {this.response = new ErrorResponse(400, "Contraseña no coinciden");}
-            else
-            {
-                Usuario usuario = new Usuario(dni,nombre,apellido,fechaNacimiento," ");
-                clienteService.guardarUsuarioLogin(usuario,new Login(username,password,usuario));
-                context.redirect("/");
-            }
-            context.render("formulario.jte",Collections.singletonMap("response",response));
+                else if (!password.equals(password2))
+                {this.response = new ErrorResponse(400, "Contraseña no coinciden");}
+                else
+                {
+                    Usuario usuario = new Usuario(dni,nombre,apellido,fechaNacimiento," ");
+                    clienteService.guardarUsuarioLogin(usuario,new Login(username,password,usuario));
+                    context.redirect("/");
+                }
+                context.render("formulario.jte",Collections.singletonMap("response",response));
 
-        }catch (Exception ex)
-               { this.response = new ErrorResponse(400,ex.getMessage());
-                   context.render("formulario.jte",Collections.singletonMap("response",response));
-               }
+            }catch (Exception ex)
+            { this.response = new ErrorResponse(400,ex.getMessage());
+                context.render("formulario.jte",Collections.singletonMap("response",response));
+            }
+
+        }else {context.render("formulario.jte",Collections.singletonMap("response",new ErrorResponse(400,"Captcha vacio")));};
 
 
     }

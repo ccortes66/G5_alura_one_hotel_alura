@@ -6,7 +6,7 @@ public final class JteloginGenerated {
 	public static void render(gg.jte.html.HtmlTemplateOutput jteOutput, gg.jte.html.HtmlInterceptor jteHtmlInterceptor, ErrorResponse response) {
 		jteOutput.writeContent("\n<!doctype html>\n<html lang=\"en\">\n");
 		gg.jte.generated.ondemand.partes.JteheadGenerated.render(jteOutput, jteHtmlInterceptor);
-		jteOutput.writeContent("\n<body>\n<section class=\"vh-100\">\n    <div class=\"container py-5 h-100\">\n        <div class=\"row d-flex align-items-center justify-content-center h-100\">\n\n            <div class=\"col-md-8 col-lg-7 col-xl-6\">\n                <img src=\"https://i.ibb.co/b78XfCB/19199349.jpg\"\n                     class=\"img-fluid\" alt=\"Phone image\"/>\n            </div>\n\n            <div class=\"col-md-7 col-lg-5 col-xl-5 offset-xl-1\">\n                <form action=\"/authetication\" method=\"post\">\n\n                    ");
+		jteOutput.writeContent("\n<body>\n<section class=\"vh-100\">\n    <div class=\"container py-5 h-100\">\n        <div class=\"row d-flex align-items-center justify-content-center h-100\">\n\n            <div class=\"col-md-8 col-lg-7 col-xl-6\">\n                <img src=\"https://i.ibb.co/b78XfCB/19199349.jpg\"\n                     class=\"img-fluid\" alt=\"Phone image\"/>\n            </div>\n\n            <div class=\"col-md-7 col-lg-5 col-xl-5 offset-xl-1\">\n                <form action=\"/empleado/autenticar\" method=\"post\">\n\n                    ");
 		if (response != null) {
 			jteOutput.writeContent("\n                        <div class=\"alert alert-danger alert-dismissible fade show mt-4\" role=\"alert\">\n                            <strong>Error ");
 			jteOutput.setContext("strong", null);
@@ -20,7 +20,7 @@ public final class JteloginGenerated {
 		jteOutput.writeContent("\n                    <div class=\"form-outline mb-4\">\n                        <input type=\"text\" id=\"username\"  name=\"username\" class=\"form-control form-control-lg\" required />\n                        <label class=\"form-label\" for=\"username\" >Username</label>\n                    </div>\n\n                    ");
 		jteOutput.writeContent("\n                    <div class=\"form-outline mb-4\">\n                        <input type=\"password\" id=\"password\" name=\"password\" class=\"form-control form-control-lg\" required />\n                        <label class=\"form-label\" for=\"password\" >Password</label>\n                    </div>\n\n                    ");
 		jteOutput.writeContent("\n                    <div class=\"form-outline mb-4  h-captcha\" data-sitekey=\"fd57c86b-3201-4b83-af0a-12f67c8fe5a1\"></div>\n\n                    ");
-		jteOutput.writeContent("\n                    <button type=\"submit\" class=\"btn btn-outline-success btn-lg btn-block mb-2\" style=\"width:100%\">Ingresar</button>\n                    <a href=\"/registrar\" class=\"btn btn-outline-primary btn-lg btn-block\" style=\"width:100%\">Registar</a>\n\n                </form>\n            </div>\n        </div>\n    </div>\n</section>\n\n\n");
+		jteOutput.writeContent("\n                    <button type=\"submit\" class=\"btn btn-outline-success btn-lg btn-block mb-2\" style=\"width:100%\">Ingresar</button>\n\n\n                </form>\n            </div>\n        </div>\n    </div>\n</section>\n\n\n");
 		gg.jte.generated.ondemand.partes.JtefooterGenerated.render(jteOutput, jteHtmlInterceptor);
 		jteOutput.writeContent("\n\n</body>\n</html>");
 	}

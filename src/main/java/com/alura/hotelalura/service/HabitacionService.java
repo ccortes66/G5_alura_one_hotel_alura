@@ -65,7 +65,6 @@ public class HabitacionService implements HabitacionRepository
             return 1;
         }catch (Exception ex)
         {entityManager.getTransaction().rollback();
-            ex.printStackTrace();
          return 0;}
     }
 
