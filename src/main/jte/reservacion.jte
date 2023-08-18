@@ -21,7 +21,7 @@
 
              <div class="col-sm p-3 min-vh-100">
                  <!-- content -->
-                 @template.partes.titulos(CookieController.getMyUsuario(),
+                 @template.partes.titulos(metodo.usuario(),
                                           "Generar Reservación",
                                            "bi-card-list fs-1")
 

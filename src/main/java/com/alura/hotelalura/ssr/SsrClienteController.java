@@ -14,9 +14,7 @@ import com.alura.hotelalura.service.ClienteService;
 import com.alura.hotelalura.service.HabitacionService;
 import com.alura.hotelalura.service.ReservaService;
 import com.alura.hotelalura.service.type.HabitacionTipoService;
-import com.alura.hotelalura.ssr.dto.ConsultaInfoReservacion;
-import com.alura.hotelalura.ssr.dto.ListarBusqueda;
-import com.alura.hotelalura.ssr.dto.ListarCatrgoriaMetodo;
+import com.alura.hotelalura.ssr.dto.*;
 import com.alura.hotelalura.ssr.error.ErrorResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,13 +45,13 @@ public class SsrClienteController
     private final ClienteRepository clienteService;
     private final HabitacionRepository habitacionService;
     private List<ReservaInfo> infoList;
-
     @Getter
     private static TreeSet<String> mysPaises = new TreeSet<>();
     private ConsultaInfoReservacion reservacion = null;
     private ListarBusqueda busqueda;
-
     private ObjectMapper mapper;
+
+    private ResultadoLista resultadoLista = null;
 
 
 
@@ -88,8 +86,10 @@ public class SsrClienteController
 
 
         javalin.get("/listar/reservaciones",context -> {
-            this.infoList = reservaService.listarReservaPorCliente(CookieController.getDinUsusario());
-            context.render("index.jte", Collections.singletonMap("infoList",infoList));
+            Usuario usuario = context.sessionAttribute("user");
+            this.infoList = reservaService.listarReservaPorCliente(usuario.getDni());
+            this.resultadoLista = new ResultadoLista(infoList,usuario);
+            context.render("index.jte", Collections.singletonMap("resultadoLista",resultadoLista));
         });
 
         javalin.get("/generar/reservacion",context -> {
@@ -98,27 +98,30 @@ public class SsrClienteController
              metodo = new ListarCatrgoriaMetodo(metodoDePagoService.listar(),
                                                 habitacionTipoService.listar(),
                                                                      response,
-                                                                      infoSsr);
+                                                                      infoSsr,
+                                                                      context.sessionAttribute("user"));
 
             context.render("reservacion.jte",Collections.singletonMap("metodo",metodo));
         });
 
         javalin.get("/buscar/reservacion",context -> {
-            this.infoList = reservaService.listarReservaPorCliente(CookieController.getDinUsusario());
-            ListarBusqueda busqueda = new ListarBusqueda(this.infoList,null);
+            Usuario usuario = context.sessionAttribute("user");
+            this.infoList = reservaService.listarReservaPorCliente(usuario.getDni());
+            ListarBusqueda busqueda = new ListarBusqueda(this.infoList,null,usuario);
             context.render("buscar.jte",Collections.singletonMap("busqueda",busqueda));
         });
 
         javalin.get("/busqueda",context ->
         {
+            Usuario user = context.sessionAttribute("user");
             this.busqueda = null;
-            this.infoList = reservaService.listarReservaPorCliente(CookieController.getDinUsusario());
+            this.infoList = reservaService.listarReservaPorCliente(user.getDni());
             Optional<ReservaInfo> myReservainfo = this.infoList.stream()
                                          .filter(data -> data.reserva().equals(context.queryParam("busqueda")))
                                          .findFirst();
             myReservainfo.ifPresentOrElse(
-                    info -> this.busqueda = new ListarBusqueda(this.infoList,info),
-                    () -> this.busqueda =  new ListarBusqueda(null,null)
+                    info -> this.busqueda = new ListarBusqueda(this.infoList,info,user),
+                    () -> this.busqueda =  new ListarBusqueda(null,null,user)
             );
 
             context.render("buscar.jte",Collections.singletonMap("busqueda",busqueda));
@@ -126,9 +129,10 @@ public class SsrClienteController
 
         javalin.get("/consultar/reservacion",context -> {
             ConsultaInfoReservacion reservacion = new ConsultaInfoReservacion(
-                                                                    habitacionTipoService.listar(),
+                                                                     habitacionTipoService.listar(),
                                                                      null,
-                                                                    null);
+                                                                    null,
+                                                                    context.sessionAttribute("user"));
             context.render("consultar.jte",Collections.singletonMap("reservacion",reservacion));
 
         });
@@ -150,12 +154,15 @@ public class SsrClienteController
                   {mysPaises.add(pais.get("name").get("common").asText());}
 
               }
-              context.render("perfil.jte",Collections.singletonMap("mysPaises",mysPaises));
+              Usuario usuario = context.sessionAttribute("user");
+              Cliente cliente = clienteService.buscar(usuario.getDni());
+              ListarPerfil listarPerfil = new ListarPerfil(mysPaises,cliente);
+              context.render("perfil.jte",Collections.singletonMap("listarPerfil",listarPerfil));
 
         });
 
         javalin.get("/eliminar",context -> {
-            Byte result = clienteService.eliminar(CookieController.getDinUsusario());
+            Byte result = clienteService.eliminar(context.sessionAttribute("idUser"));
             if(result>=1)
             {context.render("login.jte");}
             else
@@ -174,6 +181,7 @@ public class SsrClienteController
 
     private void generarReservacion(Context context)
     {
+        Usuario usuario = context.sessionAttribute("user");
 
         try
         {
@@ -182,14 +190,13 @@ public class SsrClienteController
             String categoria = context.formParam("categoria");
             String metodoPago = context.formParam("metodoPago");
 
-
             if(checkIn.isEqual(checkOut))
               { this.response =  new ErrorResponse(400,"Las Fechas son iguales");}
             else if(checkIn.isBefore(LocalDate.now()) || checkOut.isBefore(LocalDate.now()) || checkIn.isAfter(checkOut))
               { this.response =  new  ErrorResponse(400,"Las fechas pertenecen al día o días anteriores"); }
             else
               {
-                Cliente cliente = clienteService.buscar(CookieController.getDinUsusario());
+                Cliente cliente = clienteService.buscar(usuario.getDni());
                 Reserva reserva = new Reserva(cliente,checkIn,checkOut);
                 reserva.setMetodoPago(metodoDePagoService.buscar(metodoPago));
                 reserva.setValorReserva(habitacionTipoService.consultarPrecioHabitacion(checkIn,checkOut,categoria));
@@ -200,7 +207,7 @@ public class SsrClienteController
                 reserva.setHabitacion(habitacion);
                 reservaService.generar(reserva);
 
-                this.infoSsr  = reservaService.buscarResultado(CookieController.getDinUsusario());
+                this.infoSsr  = reservaService.buscarResultado(usuario.getDni());
                 this.response = new  ErrorResponse(200,"ok");
             }
         }catch (Exception ex)
@@ -209,8 +216,8 @@ public class SsrClienteController
          metodo = new ListarCatrgoriaMetodo(metodoDePagoService.listar(),
                                             habitacionTipoService.listar(),
                                             this.response,
-                                            this.infoSsr
-                                             );
+                                            this.infoSsr,
+                                            usuario);
 
          context.render("reservacion.jte",Collections.singletonMap("metodo",metodo));
 
@@ -246,7 +253,8 @@ public class SsrClienteController
 
          this.reservacion = new ConsultaInfoReservacion(habitacionTipoService.listar(),
                                                         this.response,
-                                                        registrarReserva);
+                                                        registrarReserva,
+                                                        context.sessionAttribute("user"));
          context.render("consultar.jte",Collections.singletonMap("reservacion",reservacion));
 
     }
@@ -254,21 +262,19 @@ public class SsrClienteController
     private void editarCuenta(Context context)
     {
         String telefono = context.formParam("telefono");
-
+        Usuario usuario = context.sessionAttribute("user");
+        Optional <Cliente> cliente = Optional.ofNullable(clienteService.buscar(usuario.getDni()));;
         try
         {
-              Optional <Cliente> cliente = Optional.ofNullable(clienteService.buscar(CookieController.getDinUsusario()));
               cliente.ifPresent((client) -> {
-                  Usuario usuario = client.getUsuario();
                   usuario.setTelefono(telefono);
                   clienteService.modificar(usuario,client.getUsuario().getDni());
-                  CookieController.setIsCliente(client);
               });
 
         }catch (Exception ex)
                 {ex.printStackTrace();}
 
-
-        context.render("perfil.jte",Collections.singletonMap("mysPaises",mysPaises));
+        ListarPerfil listarPerfil = new ListarPerfil(mysPaises,cliente.get());
+        context.render("perfil.jte",Collections.singletonMap("listarPerfil",listarPerfil));
     }
 }

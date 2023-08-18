@@ -14,7 +14,12 @@
         </h2>
 
         <p class="text-capitalize mt-2">
-            <i class="bi-person-circle h2 "></i> ${user.getNombre()}
+            <i class="bi-person-circle h2 "></i>
+            @if(user != null)
+                 ${user.getNombre()}
+            @else
+                 User
+            @endif
         </p>
     </div>
 <hr/>

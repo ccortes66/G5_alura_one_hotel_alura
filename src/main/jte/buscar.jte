@@ -16,7 +16,7 @@
 
              <div class="col-sm p-3 min-vh-100">
                  <!-- content -->
-                 @template.partes.titulos(CookieController.getMyUsuario(),
+                 @template.partes.titulos(busqueda.usuario(),
                                           "Buscar Reservación",
                                            "bi-search fs-1")
                  <form action="/busqueda" method="get">

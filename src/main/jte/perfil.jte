@@ -1,11 +1,12 @@
 @import com.alura.hotelalura.model.Usuario
 @import com.alura.hotelalura.ssr.CookieController
+@import com.alura.hotelalura.ssr.dto.ListarPerfil
 @import java.time.LocalDate
 @import java.time.Period
 @import java.util.TreeSet
 
 
-@param TreeSet<String> mysPaises
+@param ListarPerfil listarPerfil
 
 <!doctype html>
 <html lang="en">
@@ -19,9 +20,9 @@
 
         <div class="col-sm p-3 min-vh-100">
             <!-- content -->
-            @template.partes.titulos(CookieController.getIsCliente().getUsuario(),
-                                          "Perfil",
-                                          "bi-person-circle fs-1")
+            @template.partes.titulos(listarPerfil.cliente().getUsuario(),
+                                     "Perfil",
+                                      "bi-person-circle fs-1")
 
             <div class="container py-3">
 
@@ -32,12 +33,12 @@
                                 <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
                                      class="rounded-circle img-fluid" style="width: 150px;">
                                 <h5 class="my-3">
-                                    ${CookieController.getMyUsuario().getNombre()}
+                                    ${listarPerfil.cliente().getUsuario().getNombre()}
                                 </h5>
-                                @if(CookieController.getIsCliente().getVip() != null)
-                                    <p class="text-muted mb-1">VIP Numero ${CookieController.getIsCliente().getVip()}</p>
+                                @if(listarPerfil.cliente().getVip() != null)
+                                    <p class="text-muted mb-1">VIP Numero ${listarPerfil.cliente().getVip()}</p>
                                 @endif
-                                <p class="text-muted mb-4"> Hotel alura puntos ${CookieController.getIsCliente().getPuntos()}</p>
+                                <p class="text-muted mb-4"> Hotel alura puntos ${listarPerfil.cliente().getPuntos()}</p>
 
                             </div>
                         </div>
@@ -65,8 +66,8 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <p class="text-muted mb-0">
-                                            ${CookieController.getMyUsuario().getNombre()}
-                                            ${CookieController.getMyUsuario().getApellido()}
+                                            ${listarPerfil.cliente().getUsuario().getNombre()}
+                                            ${listarPerfil.cliente().getUsuario().getApellido()}
                                         </p>
                                     </div>
                                 </div>
@@ -78,7 +79,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <p class="text-muted mb-0">
-                                            ${Period.between(CookieController.getMyUsuario().getFechaNacimiento(),LocalDate.now()).getYears()}
+                                            ${Period.between(listarPerfil.cliente().getUsuario().getFechaNacimiento(),LocalDate.now()).getYears()}
                                         </p>
                                     </div>
                                 </div>
@@ -89,7 +90,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <p class="text-muted mb-0">
-                                            ${CookieController.getIsCliente().getUsuario().getTelefono()}
+                                            ${listarPerfil.cliente().getUsuario().getTelefono()}
                                         </p>
                                     </div>
                                 </div>
@@ -116,7 +117,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <p class="text-muted mb-0">
-                                                <input type="tel" id="telefono" name="telefono" required class="form-control" value="${CookieController.getIsCliente().getUsuario().getTelefono()}" />
+                                                <input type="tel" id="telefono" name="telefono" required class="form-control" value="${listarPerfil.cliente().getUsuario().getTelefono()}" />
                                             </p>
                                         </div>
                                     </div>
@@ -128,8 +129,8 @@
                                         <div class="col-sm-9">
                                             <p class="text-muted mb-0">
                                                 <select class="form-select" id="metodoPago" name="metodoPago" aria-label="Default select example" required>
-                                                    @if(!mysPaises.isEmpty())
-                                                        @for(String valor: mysPaises)
+                                                    @if(!listarPerfil.mysPaises().isEmpty())
+                                                        @for(String valor: listarPerfil.mysPaises())
                                                             <option value="${valor}">${valor}</option>
                                                         @endfor
                                                     @endif
@@ -180,7 +181,6 @@
       })
   });
 </script>
-
 @endraw
 
 @template.partes.footer()

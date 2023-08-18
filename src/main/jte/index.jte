@@ -1,24 +1,24 @@
-@import com.alura.hotelalura.model.Usuario
 @import com.alura.hotelalura.repository.dto.ReservaInfo
 @import java.text.DecimalFormat
-@import java.util.List
 @import com.alura.hotelalura.ssr.CookieController
+@import com.alura.hotelalura.ssr.dto.ResultadoLista
 
-@param List<ReservaInfo> infoList
+@param ResultadoLista resultadoLista
+
+
 
 <!doctype html>
 <html lang="en">
 @template.partes.head()
 <body>
 
-    
     <section class="container-fluid">
          <div class="row">
              @template.partes.siderbar()
 
              <div class="col-sm p-3 min-vh-100">
-                 <!-- content -->
-                 @template.partes.titulos(CookieController.getMyUsuario(),
+
+                  @template.partes.titulos(resultadoLista.usuario(),
                                           "Mis reservaciones",
                                           "bi-arrow-repeat fs-1")
 
@@ -34,8 +34,8 @@
                      </tr>
                      </thead>
                      <tbody>
-                     @if(infoList != null)
-                         @for(ReservaInfo reservaInfo: infoList)
+                     @if(resultadoLista.infoList() != null)
+                         @for(ReservaInfo reservaInfo: resultadoLista.infoList())
                              <tr>
                                  <td class="text-capitalize">${reservaInfo.reserva()}</td>
                                  <td class="text-capitalize">${String.valueOf(reservaInfo.checkIn())}</td>

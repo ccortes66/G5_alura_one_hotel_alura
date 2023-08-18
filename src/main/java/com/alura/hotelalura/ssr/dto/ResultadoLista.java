@@ -5,6 +5,6 @@ import com.alura.hotelalura.repository.dto.ReservaInfo;
 
 import java.util.List;
 
-public record ListarBusqueda(List<ReservaInfo> lista,
-                             ReservaInfo info,
-                             Usuario usuario) { }
+public record ResultadoLista(List<ReservaInfo> infoList,
+                             Usuario usuario) {
+}

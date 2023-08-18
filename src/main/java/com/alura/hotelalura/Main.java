@@ -1,9 +1,7 @@
 package com.alura.hotelalura;
 
 import com.alura.hotelalura.config.CDI;
-import com.alura.hotelalura.controller.ClienteController;
-import com.alura.hotelalura.controller.EmpleadoController;
-import com.alura.hotelalura.controller.LoginController;
+import com.alura.hotelalura.ssr.CoockieControllerEmpleado;
 import com.alura.hotelalura.ssr.CookieController;
 import com.alura.hotelalura.ssr.SsrClienteController;
 import com.google.inject.Guice;
@@ -22,16 +20,21 @@ public class Main
 
 
         //csr
+        /*
         Javalin restApi = Javalin.create().start(8080);
         new ClienteController(restApi,injector);
         new LoginController(restApi,injector);
         new EmpleadoController(restApi,injector);
+        */
 
-
-        //ssr
-        Javalin ssr = Javalin.create().start(8083);
+        //ssr cliente
+        Javalin ssr = Javalin.create().start(8080);
         new CookieController(ssr,injector);
         new SsrClienteController(ssr,injector);
+
+        //ssr empleado
+        Javalin ssrEmpleados = Javalin.create().start(8083);
+        new CoockieControllerEmpleado(ssrEmpleados,injector);
 
 
     }

@@ -1,6 +1,5 @@
 package com.alura.hotelalura.ssr;
 
-import com.alura.hotelalura.model.Cliente;
 import com.alura.hotelalura.model.Login;
 import com.alura.hotelalura.model.Usuario;
 import com.alura.hotelalura.repository.dto.ConseguirUsuario;
@@ -8,6 +7,7 @@ import com.alura.hotelalura.repository.persistence.ClienteRepository;
 import com.alura.hotelalura.repository.persistence.LoginRepository;
 import com.alura.hotelalura.service.ClienteService;
 import com.alura.hotelalura.service.LoginService;
+import com.alura.hotelalura.ssr.dto.ResultadoLista;
 import com.alura.hotelalura.ssr.error.ErrorResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,8 +15,6 @@ import com.google.inject.Injector;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -36,12 +34,8 @@ public class CookieController
     private final LoginRepository loginService;
     private final ClienteRepository clienteService;
     private static ObjectMapper mapper = new ObjectMapper();
-    @Getter
-    private static String dinUsusario;
-    @Getter
-    private static Usuario myUsuario;
-    @Getter @Setter
-    private static Cliente isCliente = null;
+
+
 
     public CookieController(Javalin javalin, Injector injector)
     {
@@ -53,14 +47,13 @@ public class CookieController
         eventosHtml();
     }
 
-
-
     private void cargarHtml()
     {
-        //validador de coockies
+        //validador de sessiones
         javalin.before(context -> {
-            if(!isValidCookie(context) && !context.path().equals("/registrar"))
-            {context.render("login.jte");}
+            if(!isValidSession(context) && !context.path().equals("/registrar"))
+              {context.render("login.jte");}
+
         });
 
         javalin.get("/", context -> context.render("login.jte"));
@@ -91,11 +84,9 @@ public class CookieController
                 Optional<Usuario> usuario = loginService.ingresoSistema(new ConseguirUsuario(username,password));
                 usuario.ifPresentOrElse(
                         (user) -> {
-                            Optional <Cliente> cliente = Optional.ofNullable(clienteService.buscar(user.getDni()));
-                            setSessionCookie(context,user.getDni());
-                            myUsuario = user;
-                            cliente.ifPresent(value -> isCliente = value);
-                            context.render("index.jte", Collections.singletonMap("user",user));
+                            context.sessionAttribute("user",user);
+                            ResultadoLista resultadoLista = new ResultadoLista(null,user);
+                            context.render("index.jte", Collections.singletonMap("resultadoLista",resultadoLista));
                         },
                         () ->  context.render("login.jte",Collections.singletonMap("response",response))
                 );
@@ -107,26 +98,15 @@ public class CookieController
 
     }
 
-    private boolean isValidCookie(Context context)
+    private boolean isValidSession(Context context)
     {
-        String coockie = getSessionCookie(context);
-        return coockie != null && !coockie.isEmpty();
-    }
-
-    private void setSessionCookie(Context context,String dni)
-    {
-       context.cookie("dni",dni,3600);
-       dinUsusario = dni;
-    }
-
-    public String getSessionCookie(Context context)
-    {
-        return context.cookie("dni");
+        Usuario session = context.sessionAttribute("user");
+        return session != null;
     }
 
     private void closedSession(Context context)
     {
-        context.removeCookie("dni");
+        context.sessionAttribute("user",null);
         context.redirect("/");
     }
 
@@ -192,8 +172,8 @@ public class CookieController
                }
 
 
-
     }
+
 
     public static class MiddewareCookie implements Handler
     {
@@ -202,19 +182,15 @@ public class CookieController
         public void handle(@NotNull Context context) throws Exception
         {
 
-            if(!isValidCookie(context) && !context.path().equals("/registrar"))
+            if(!isValidSession(context) && !context.path().equals("/registrar"))
               {context.render("login.jte");}
+
         }
 
-        private boolean isValidCookie(Context context)
+        private boolean isValidSession(Context context)
         {
-            String coockie = getSessionCookie(context);
-            return coockie != null && !coockie.isEmpty();
-        }
-
-        private String getSessionCookie(Context context)
-        {
-            return context.cookie("dni");
+            Usuario user = context.sessionAttribute("user");
+            return user != null;
         }
 
     }
