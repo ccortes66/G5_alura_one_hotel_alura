@@ -5,7 +5,13 @@ import com.alura.hotelalura.repository.persistence.LoginRepository;
 import com.alura.hotelalura.service.EmpleadoService;
 import com.alura.hotelalura.service.LoginService;
 import com.google.inject.Injector;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.RequestBody;
 import io.javalin.Javalin;
+import io.javalin.http.Context;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CoockieControllerEmpleado
 {
@@ -32,6 +38,15 @@ public class CoockieControllerEmpleado
         });
 
         javalin.get("/",context -> context.render("employer/login.jte"));
+    }
+
+    private boolean verificarCaptcha(Context context)
+    {
+        Map<String,String> params = new HashMap<>();
+        params.put("response",context.formParam("h-captcha-response"));
+        params.put("secret",System.getenv("secret"));
+
+        return false;
     }
 
 
