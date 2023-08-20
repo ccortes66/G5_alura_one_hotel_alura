@@ -59,3 +59,11 @@ volumes:
    127.0.0.1 hotelalura.com
 ```
 - Puertos por defecto:8080 clientes y 8083 para empleados, si tienen inconvenientes con los puertos suele suceder por estas razones esta ocupado o este bloqueado por el firewall de su PC
+
+## Interface Usuario
+Interface cliente
+
+https://github.com/ccortes66/G5_alura_one_hotel_alura/assets/63931313/37250a0a-888e-4ce2-b109-96dfef6c8c29
+
+
+
