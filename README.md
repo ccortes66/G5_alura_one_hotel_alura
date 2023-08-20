@@ -61,9 +61,19 @@ volumes:
 - Puertos por defecto:8080 clientes y 8083 para empleados, si tienen inconvenientes con los puertos suele suceder por estas razones esta ocupado o este bloqueado por el firewall de su PC
 
 ## Interface Usuario
-Interface cliente
+Interface Cliente
 
-https://github.com/ccortes66/G5_alura_one_hotel_alura/assets/63931313/37250a0a-888e-4ce2-b109-96dfef6c8c29
+
+https://github.com/ccortes66/G5_alura_one_hotel_alura/assets/63931313/f3d8a71b-3bc0-4099-9e7d-4afca899a5f1
+
+
+
+Interface Empleado
+
+https://github.com/ccortes66/G5_alura_one_hotel_alura/assets/63931313/82569c4a-8438-4653-9d72-5d8d32eb6f8f
+
+
+
 
 
 
