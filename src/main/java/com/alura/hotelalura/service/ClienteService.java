@@ -51,13 +51,13 @@ public class ClienteService implements ClienteRepository
 
 
     @Override
-    public Byte guardarUsuarioLogin(Usuario usuario, Login login)
+    public Byte guardarUsuarioLogin(Cliente cliente, Login login)
     {
         entityManager.getTransaction().begin();
         try
         {
-            entityManager.persist(usuario);
-            entityManager.persist(new Cliente(usuario));
+            entityManager.persist(cliente.getUsuario());
+            entityManager.persist(cliente);
             login.setPassword(argon2.hash(2,65536,2,login.getPassword().toCharArray()));
             entityManager.persist(login);
             entityManager.flush();

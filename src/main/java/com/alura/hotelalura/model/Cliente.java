@@ -1,5 +1,6 @@
 package com.alura.hotelalura.model;
 
+import com.alura.hotelalura.model.type.Nacionalidad;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,6 +20,9 @@ public class Cliente
     @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @NonNull
     private Usuario usuario;
+
+    @NonNull
+    private String nacionalidad;
 
     private Integer puntos = 0;
 

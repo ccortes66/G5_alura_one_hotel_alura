@@ -28,7 +28,7 @@
                 <p class="text-capitalize">buscar</p>
                 <div class="input-group">
                     <div class="form-outline">
-                        <input type="search" id="form1" name="buscar" class="form-control" />
+                        <input type="number" id="form1" name="buscar" class="form-control" />
                     </div>
                     <button type="submit"  class="btn btn-primary">
                         <i class="fas fa-search"></i>

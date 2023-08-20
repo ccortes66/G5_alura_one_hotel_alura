@@ -44,6 +44,7 @@
 
                     <!-- Submit button -->
                     <button type="submit" class="btn btn-outline-success btn-lg btn-block mb-2" style="width:100%">Ingresar</button>
+                    <a href="/empleado/registrar" class="btn btn-outline-primary btn-lg btn-block" style="width:100%">Registar</a>
 
 
                 </form>

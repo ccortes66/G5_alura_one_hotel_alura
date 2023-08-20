@@ -21,13 +21,8 @@ public class Empleado
     @NonNull
     private Usuario usuario;
 
-    @Column(length = 10)
-    private String permisos;
-
-    @ManyToOne
-    private EmpleadoTipo tipo;
-
-
+    @NonNull
+    private String tipoEmpleado;
 
 
 

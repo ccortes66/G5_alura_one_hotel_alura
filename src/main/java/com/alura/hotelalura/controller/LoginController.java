@@ -1,6 +1,8 @@
 package com.alura.hotelalura.controller;
 
 import com.alura.hotelalura.auth.JWTGenerate;
+import com.alura.hotelalura.model.Cliente;
+import com.alura.hotelalura.model.Empleado;
 import com.alura.hotelalura.model.Login;
 import com.alura.hotelalura.model.Usuario;
 import com.alura.hotelalura.repository.dto.ConseguirUsuario;
@@ -76,7 +78,7 @@ public class LoginController
 
         validarDatos(registrarUsuario,usuario);
 
-        Byte result = clienteService.guardarUsuarioLogin(usuario,new Login(registrarUsuario.username().trim(),
+        Byte result = clienteService.guardarUsuarioLogin(new Cliente(usuario," "),new Login(registrarUsuario.username().trim(),
                                                                            registrarUsuario.password().trim(),
                                                                            usuario));
         if (result>=1)
@@ -94,7 +96,7 @@ public class LoginController
         Usuario usuario = registrarUsuario.usuario();
         validarDatos(registrarUsuario,usuario);
 
-        Byte result = empleadoService.guardarUsuarioLogin(usuario,new Login(registrarUsuario.username().trim(),
+        Byte result = empleadoService.guardarUsuarioLogin(new Empleado(usuario," "),new Login(registrarUsuario.username().trim(),
                                                                             registrarUsuario.password().trim(),
                                                                             usuario));
         if(result>=1)

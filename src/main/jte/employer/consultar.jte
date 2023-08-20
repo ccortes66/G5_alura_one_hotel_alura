@@ -15,7 +15,7 @@
     
     <section class="container-fluid">
          <div class="row">
-             @template.partes.siderbar()
+             @template.partes.siderbarEmpleado()
 
              <div class="col-sm p-3 min-vh-100">
                  <!-- content -->
@@ -23,7 +23,7 @@
                                           "Consultar Precio",
                                            "bi-cash-stack fs-1")
 
-                 <form action="/consultar/reservacion" method="post">
+                 <form action="/consultar/reservacion/empleado" method="post">
                   <div class="row g-3">
 
                      <div class="col-auto">
@@ -80,7 +80,6 @@
                                         <li class=" card-text">Precio(USD) $${reservacion.reserva().metodoPago()}</li>
                                      </ul>
 
-                                     <a href="/generar/reservacion" class="card-link">reservar ahora</a>
                                  </div>
                              </div>
                          </div>

@@ -34,8 +34,7 @@ public class Usuario
     @Column(nullable = false)
     private LocalDate fechaNacimiento;
 
-    @ManyToOne
-    private Nacionalidad nacionalidad;
+
 
     @Column(length = 20)
     @NonNull

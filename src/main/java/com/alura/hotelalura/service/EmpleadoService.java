@@ -88,13 +88,13 @@ public class EmpleadoService implements EmpleadoRepository
 
 
     @Override
-    public Byte guardarUsuarioLogin(Usuario usuario, Login login)
+    public Byte guardarUsuarioLogin(Empleado empleado, Login login)
     {
         entityManager.getTransaction().begin();
         try
         {
-            entityManager.persist(usuario);
-            entityManager.persist(new Empleado(usuario));
+            entityManager.persist(empleado.getUsuario());
+            entityManager.persist(empleado);
             login.setPassword(argon2.hash(2,65536,2,login.getPassword().toCharArray()));
             entityManager.persist(login);
             entityManager.getTransaction().commit();

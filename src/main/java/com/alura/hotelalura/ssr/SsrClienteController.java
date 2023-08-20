@@ -139,21 +139,7 @@ public class SsrClienteController
 
         javalin.get("/perfil",context -> {
 
-              OkHttpClient client = new OkHttpClient();
-              Request request = new Request.Builder()
-                                               .url("https://restcountries.com/v3.1/all")
-                                               .build();
 
-              Response responses = client.newCall(request).execute();
-              String responseBody = responses.body().string();
-              JsonNode paises = mapper.readTree(responseBody);
-
-              if(mysPaises.isEmpty())
-              {
-                  for (JsonNode pais: paises)
-                  {mysPaises.add(pais.get("name").get("common").asText());}
-
-              }
               Usuario usuario = context.sessionAttribute("user");
               Cliente cliente = clienteService.buscar(usuario.getDni());
               ListarPerfil listarPerfil = new ListarPerfil(mysPaises,cliente);
@@ -268,13 +254,13 @@ public class SsrClienteController
         {
               cliente.ifPresent((client) -> {
                   usuario.setTelefono(telefono);
-                  clienteService.modificar(usuario,client.getUsuario().getDni());
+                  clienteService.modificar(usuario,usuario.getDni());
               });
 
         }catch (Exception ex)
-                {ex.printStackTrace();}
+                {ex.getMessage();}
 
-        ListarPerfil listarPerfil = new ListarPerfil(mysPaises,cliente.get());
+        ListarPerfil listarPerfil = new ListarPerfil(mysPaises,clienteService.buscar(usuario.getDni()));
         context.render("perfil.jte",Collections.singletonMap("listarPerfil",listarPerfil));
     }
 }

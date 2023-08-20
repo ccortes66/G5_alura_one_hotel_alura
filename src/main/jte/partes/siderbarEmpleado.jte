@@ -17,8 +17,13 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/consultar/reservacion" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Orders">
+                        <a href="/consultar/reservacion/empleado" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Orders">
                             <i class="bi-cash-stack fs-1"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/administar/pagos" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Orders">
+                            <i class="bi bi-wallet fs-1"></i>
                         </a>
                     </li>
 

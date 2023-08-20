@@ -46,6 +46,20 @@ public class ReservaService implements ReservaRepository
     }
 
     @Override
+    public ReservaInfoEmpleados busquedaEmpleado(String valor)
+    {
+        jpql = "SELECT NEW com.alura.hotelalura.repository.dto.ReservaInfoEmpleados("+
+                "RS.reserva,RS.checkIn,RS.checkOut,RS.habitacion.tipo.nombre,RS.habitacion.numero,RS.metodoPago.nombre," +
+                "RS.habitacion.numero) "+
+                "FROM Reserva RS "+
+                "WHERE RS.reserva = :valor ";
+
+         TypedQuery<ReservaInfoEmpleados> query = entityManager.createQuery(jpql,ReservaInfoEmpleados.class);
+         query.setParameter("valor",valor.trim());
+         return query.getSingleResult();
+    }
+
+    @Override
     public Byte eliminar(String codigo)
     {
         entityManager.getTransaction().begin();

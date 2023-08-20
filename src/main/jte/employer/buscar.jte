@@ -1,9 +1,6 @@
-@import com.alura.hotelalura.repository.dto.ReservaInfo
-@import com.alura.hotelalura.ssr.CookieController
-@import java.text.DecimalFormat
-@import com.alura.hotelalura.ssr.dto.ListarBusqueda
+@import com.alura.hotelalura.ssr.dto.ListarBusquedaEmpleado
 
-@param ListarBusqueda busqueda
+@param ListarBusquedaEmpleado listarBusquedaEmpleado
 <!doctype html>
 <html lang="en">
 @template.partes.head()
@@ -16,47 +13,44 @@
 
              <div class="col-sm p-3 min-vh-100">
                  <!-- content -->
-                 @template.partes.titulos(busqueda.usuario(),
+                 @template.partes.titulos(listarBusquedaEmpleado.usuario(),
                                           "Buscar Reservación",
                                            "bi-search fs-1")
-                 <form action="/busqueda" method="get">
+                 <form action="/busqueda/reservacion" method="get">
                      <label for="exampleDataList" class="form-label">Buscar</label>
-                     <input class="form-control" list="datalistOptions" name="busqueda" id="exampleDataList" placeholder="Type to search...">
-                         <datalist id="datalistOptions">
-                             @if(busqueda.lista() != null)
-                               @for(ReservaInfo reservaInfo: busqueda.lista() )
-                                   <option value="${reservaInfo.reserva()}"></option>
-                               @endfor
-                             @endif
-                         </datalist>
-                </form>
+                     <input class="form-control" list="datalistOptions" name="busqueda" id="campoBusqueda" placeholder="Type to search...">
+                 </form>
+
                     <table class="table table-hover mt-3">
                      <thead >
                          <tr>
-                             <th scope="col">reserva</th>
-                             <th scope="col">checkIn</th>
-                             <th scope="col">checkOut</th>
-                             <th scope="col">precio</th>
-                             <th scope="col">categoria</th>
-                             <th scope="col">habitacion</th>
+                             <th scope="col">Reserva</th>
+                             <th scope="col">CheckIn</th>
+                             <th scope="col">CheckOut</th>
+                             <th scope="col">Categoria</th>
+                             <th scope="col">Método de Pago</th>
+                             <th scope="col">Habitación</th>
+                             <th scope="col">Accion</th>
                          </tr>
                      </thead>
                      <tbody>
-                     <tr>
-                         @if(busqueda.info() != null)
-                             <td class="text-capitalize">${busqueda.info().reserva()}</td>
-                             <td class="text-capitalize">${String.valueOf(busqueda.info().checkIn())}</td>
-                             <td class="text-capitalize">${String.valueOf(busqueda.info().checkOut())}</td>
-                             <td class="text-capitalize">${new DecimalFormat("#,###.00").format(busqueda.info().precio())}</td>
-                             <td class="text-capitalize">${busqueda.info().categoria()}</td>
-                             <td class="text-capitalize">${busqueda.info().habitacion().toString()}</td>
+                     <tr id="myResult">
+                         @if(listarBusquedaEmpleado.infoEmpleados() != null)
+                             <td  class="text-capitalize">${listarBusquedaEmpleado.infoEmpleados().reserva()}</td>
+                             <td class="text-capitalize">${String.valueOf(listarBusquedaEmpleado.infoEmpleados().checkIn())}</td>
+                             <td class="text-capitalize">${String.valueOf(listarBusquedaEmpleado.infoEmpleados().checkOut())}</td>
+                             <td class="text-capitalize">${listarBusquedaEmpleado.infoEmpleados().categoria()}</td>
+                             <td class="text-capitalize">${listarBusquedaEmpleado.infoEmpleados().metodoPago()}</td>
+                             <td class="text-capitalize">${listarBusquedaEmpleado.infoEmpleados().numero()}</td>
+                             <td class="text-capitalize"><a id="btnEliminar" class="btn btn-outline-danger btn-block">Eliminar</a></td>
+
                          @endif
                      </tr>
 
                      </tbody>
                  </table>
 
-                 @if(busqueda.info() == null && busqueda.lista() == null)
+                 @if(listarBusquedaEmpleado.infoEmpleados() == null && !listarBusquedaEmpleado.confirm())
                      <div class="alert alert-info alert-dismissible fade show mt-4" role="alert">
                          <strong>Error 404</strong> No existe registros
                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -69,9 +63,25 @@
 
     @raw
     <script>
+        let data = document.querySelector("#btnEliminar");
 
-
-
+         data.addEventListener("click",()=>{
+         Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡Esta acción no se puede deshacer!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'No',
+            reverseButtons: false
+         }).then((resultado)=>{
+            if(resultado.isConfirmed){
+               let reservaValor = document.querySelector("#myResult")
+               let elementoLista = reservaValor.getElementsByTagName("td");
+               window.location.href = "/eliminar/reservacion?busqueda="+elementoLista[0].innerHTML;
+            }
+          })
+      });
     </script>
     @endraw
 

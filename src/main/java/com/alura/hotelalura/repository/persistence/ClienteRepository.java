@@ -9,7 +9,7 @@ public interface ClienteRepository extends CompuestoRepository<Cliente,String>
 {
 
     Cliente agregarVip(Cliente cliente, Byte numero);
-    Byte guardarUsuarioLogin(Usuario usuario, Login login);
+    Byte guardarUsuarioLogin(Cliente cliente, Login login);
     Byte modificar(Usuario usuario, String dni);
 
 }

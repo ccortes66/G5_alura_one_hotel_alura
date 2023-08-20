@@ -1,5 +1,6 @@
 package com.alura.hotelalura.ssr;
 
+import com.alura.hotelalura.model.Cliente;
 import com.alura.hotelalura.model.Login;
 import com.alura.hotelalura.model.Usuario;
 import com.alura.hotelalura.repository.dto.ConseguirUsuario;
@@ -12,9 +13,13 @@ import com.alura.hotelalura.ssr.error.ErrorResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Injector;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -34,17 +39,19 @@ public class CookieController
     private final LoginRepository loginService;
     private final ClienteRepository clienteService;
     private static ObjectMapper mapper = new ObjectMapper();
+    @Getter
+    private final static TreeSet<String> mysPaises = new TreeSet<>();
 
 
 
-    public CookieController(Javalin javalin, Injector injector)
-    {
+    public CookieController(Javalin javalin, Injector injector) throws IOException {
         this.javalin = javalin;
         this.injector = injector;
         this.loginService = injector.getInstance(LoginService.class);
         this.clienteService = injector.getInstance(ClienteService.class);
         cargarHtml();
         eventosHtml();
+        generarPaises();
     }
 
     private void cargarHtml()
@@ -76,7 +83,6 @@ public class CookieController
         String password = context.formParam("password");
 
         this.response = new ErrorResponse(400,"Usuario o contraseña errónea");
-
 
         try
         {
@@ -150,6 +156,8 @@ public class CookieController
                 String username = context.formParam("username");
                 String password = context.formParam("password");
                 String password2 = context.formParam("password2");
+                String nacionalidad = context.formParam("nacionalidad");
+
                 int edad = Period.between(fechaNacimiento, LocalDate.now()).getYears();
 
                 if (!dni.matches("^[0-9A-Za-z]+$") || !nombre.matches("^[0-9A-Za-z ]+$") ||
@@ -164,7 +172,7 @@ public class CookieController
                 else
                 {
                     Usuario usuario = new Usuario(dni,nombre,apellido,fechaNacimiento," ");
-                    clienteService.guardarUsuarioLogin(usuario,new Login(username,password,usuario));
+                    clienteService.guardarUsuarioLogin(new Cliente(usuario,nacionalidad),new Login(username,password,usuario));
                     context.redirect("/");
                 }
                 context.render("formulario.jte",Collections.singletonMap("response",response));
@@ -177,6 +185,25 @@ public class CookieController
         }else {context.render("formulario.jte",Collections.singletonMap("response",new ErrorResponse(400,"Captcha vacio")));};
 
 
+    }
+
+    private void generarPaises() throws IOException {
+
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("https://restcountries.com/v3.1/all")
+                .build();
+
+        Response responses = client.newCall(request).execute();
+        String responseBody = responses.body().string();
+        JsonNode paises = mapper.readTree(responseBody);
+
+        if(mysPaises.isEmpty())
+        {
+            for (JsonNode pais: paises)
+            {mysPaises.add(pais.get("name").get("common").asText());}
+
+        }
     }
 
 

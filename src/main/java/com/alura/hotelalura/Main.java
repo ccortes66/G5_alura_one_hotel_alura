@@ -10,15 +10,14 @@ import com.google.inject.Injector;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
 
+import java.io.IOException;
+
 
 public class Main
 {
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) throws IOException {
         JavalinJte.init();
-
         Injector injector = Guice.createInjector(new CDI());
-
 
         //csr
         /*

@@ -1,6 +1,7 @@
 package com.alura.hotelalura.ssr;
 
 import com.alura.hotelalura.model.Empleado;
+import com.alura.hotelalura.model.Login;
 import com.alura.hotelalura.model.Usuario;
 import com.alura.hotelalura.repository.dto.ConseguirUsuario;
 import com.alura.hotelalura.repository.persistence.EmpleadoRepository;
@@ -22,10 +23,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -59,7 +59,10 @@ public class CoockieControllerEmpleado
 
         javalin.get("/",context -> context.render("employer/login.jte",Collections.singletonMap("response",null)));
         javalin.get("/cerrar",this::closedSession);
+        javalin.get("/empleado/registrar",context -> context.render("employer/formulario.jte"));
+
         javalin.post("/empleado/autenticar",this::ingresoAlSystema);
+        javalin.post("/empleado/registrar",this::registarUsuario);
     }
 
     private void closedSession(Context context)
@@ -123,6 +126,51 @@ public class CoockieControllerEmpleado
             }catch (Exception ex) {context.render("employer/login.jte",Collections.singletonMap("response",new ErrorResponse(500,ex.getMessage())));}
 
     }
+    private void registarUsuario(Context context) throws IOException {
+        this.response = null;
+
+        if (verificarCaptcha(context))
+        {
+            try {
+                String dni = context.formParam("dni");
+                String nombre = context.formParam("nombre");
+                String apellido = context.formParam("apellido");
+                LocalDate fechaNacimiento = LocalDate.parse(Objects.requireNonNull(context.formParam("fechaNacimiento")));
+                String username = context.formParam("username");
+                String password = context.formParam("password");
+                String password2 = context.formParam("password2");
+                String cargo = context.formParam("cargo");
+                int edad = Period.between(fechaNacimiento, LocalDate.now()).getYears();
+
+                if (!dni.matches("^[0-9A-Za-z]+$") || !nombre.matches("^[0-9A-Za-z ]+$") ||
+                        !apellido.matches("^[0-9A-Za-z ]+$") || !username.matches("^[0-9A-Za-z]+$"))
+                {this.response = new ErrorResponse(400, "Campos llevan caracteres especiales");}
+
+                else if (edad <= 17)
+                {this.response = new ErrorResponse(400, "Eres menor de edad");}
+
+                else if (!password.equals(password2))
+                {this.response = new ErrorResponse(400, "Contraseña no coinciden");}
+                else
+                {
+                    Usuario usuario = new Usuario(dni,nombre,apellido,fechaNacimiento," ");
+                    empleadoService.guardarUsuarioLogin(new Empleado(usuario,cargo),new Login(username,password,usuario));
+                    context.redirect("/");
+                }
+                context.render("formulario.jte",Collections.singletonMap("response",response));
+
+            }catch (Exception ex)
+            { this.response = new ErrorResponse(400,ex.getMessage());
+                context.render("formulario.jte",Collections.singletonMap("response",response));
+            }
+
+        }else {context.render("formulario.jte",Collections.singletonMap("response",new ErrorResponse(400,"Captcha vacio")));};
+
+
+    }
+
+
+
     public static class MiddleareEmpleado implements Handler
     {
 

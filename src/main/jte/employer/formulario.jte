@@ -1,8 +1,8 @@
 @import com.alura.hotelalura.ssr.error.ErrorResponse
-@import com.alura.hotelalura.ssr.CookieController
+@import java.util.List
 
 @param ErrorResponse response
-
+@param List<String> listaCargo = java.util.Arrays.asList("Gerente","Admon","Secretaria","Ascensor comercial")
 
 <!doctype html>
 <html lang="en">
@@ -19,7 +19,7 @@
 
                                 <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Registro</p>
 
-                                <form class="mx-1 mx-md-4" method="post" action="/registrar">
+                                <form class="mx-1 mx-md-4" method="post" action="/empleado/registrar">
                                     @if(response != null)
                                         <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
                                             <strong>Error ${response.status()} </strong> ${response.Detail()}
@@ -62,18 +62,6 @@
                                     <div class="d-flex flex-row align-items-center mb-4">
                                         <i class="fas fa-user fa-lg me-3 fa-fw"></i>
                                         <div class="form-outline flex-fill mb-0">
-                                            <select class="form-select" id="categoria" name="nacionalidad" aria-label="Default select example" required>
-                                                @for(String pais : CookieController.getMysPaises())
-                                                    <option class="text-capitalize" value="${pais}">${pais}</option>
-                                                @endfor
-                                            </select>
-                                            <label class="form-label" for="categoria">Nacionalidad</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex flex-row align-items-center mb-4">
-                                        <i class="fas fa-user fa-lg me-3 fa-fw"></i>
-                                        <div class="form-outline flex-fill mb-0">
                                             <input type="text" id="username" name="username" required class="form-control" />
                                             <label class="form-label" for="username">username</label>
                                         </div>
@@ -94,6 +82,20 @@
                                         <div class="form-outline flex-fill mb-0">
                                             <input type="password" id="password2" name="password2" required class="form-control" />
                                             <label class="form-label" for="password2">Confirmar Contraseña</label>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                        <select class="form-select" id="categoria" name="cargo" aria-label="Default select example" required>
+                                            @for(String cargo : listaCargo)
+                                                    <option class="text-capitalize" value="${cargo}">${cargo}</option>
+                                            @endfor
+                                        </select>
+                                            <label class="form-label" for="categoria">Cargo</label>
                                         </div>
                                     </div>
 

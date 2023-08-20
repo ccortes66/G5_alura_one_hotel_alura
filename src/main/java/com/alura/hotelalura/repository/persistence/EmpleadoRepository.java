@@ -7,7 +7,7 @@ import com.alura.hotelalura.model.Usuario;
 
 public interface EmpleadoRepository extends CompuestoRepository<Empleado,String>
 {
-    Byte guardarUsuarioLogin(Usuario usuario, Login login);
+    Byte guardarUsuarioLogin(Empleado empleado, Login login);
     Byte modificar(Usuario usuario, String dni);
 
 }

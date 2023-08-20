@@ -20,4 +20,6 @@ public interface ReservaRepository extends CompuestoRepository<Reserva,String>
     ReservaInfoSsr buscarResultado(String dni);
 
     List<ReservaInfoEmpleados> listaReservaActual(Integer skip,Integer limit);
+
+    ReservaInfoEmpleados busquedaEmpleado(String valor);
 }

@@ -24,7 +24,7 @@
                                           "Generar Habitaciones",
                                           "bi-card-list fs-1")
 
-                 <form class="row g-3">
+                 <form action="/generar/habitacion/tipo" method="post" class="row g-3" >
                      <h4 class="text-capitalize">Generar Tipo Habitacion </h4>
                      <div class="col-auto">
                          <label for="staticEmail2">Categoria</label>
@@ -42,13 +42,19 @@
                          <button type="submit" class="btn btn-outline-success mt-4">Agregar</button>
                      </div>
                  </form>
+                 @if(respuesta.confirm()[0])
+                     <div class="alert alert-info alert-dismissible fade show mt-4" role="alert">
+                         <strong>¡Tipo Habitación creada!</strong> Se registran los datos en el sistema
+                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                     </div>
+                 @endif
                  <hr>
 
-                 <form class="row g-2 my-2">
+                 <form action="/generar/habitacion" method="post"  class="row g-2 my-2">
                      <h4 class="text-capitalize"> Generar Habitacion </h4>
                      <div class="col-auto">
                          <label for="staticEmail2">Numero</label>
-                         <input type="number" required class="form-control" id="staticEmail2" >
+                         <input type="number" required name="numero" class="form-control" id="staticEmail2" >
                      </div>
                      <div class="col-auto">
                          <label for="inputPassword2" >Habitacion tipo</label>
@@ -62,48 +68,14 @@
                          <button type="submit" class="btn btn-outline-success mt-4">Agregar</button>
                      </div>
                  </form>
+                 @if(respuesta.confirm()[1])
+                     <div class="alert alert-info alert-dismissible fade show mt-4" role="alert">
+                         <strong>!Habitación creada!</strong> Se registran los datos en el sistema
+                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                     </div>
+                 @endif
                  <hr>
 
-
-                 <form action="/busqueda" class="row g-2 my-2" method="get">
-                     <h4 class="text-capitalize">Eliminar Reserva</h4>
-                     <div class="input-group col-sm-9">
-                         <div class="form-outline">
-                             <input type="search" id="form1" name="buscar" class="form-control" />
-                         </div>
-                         <button type="submit"  class="btn btn-primary">
-                             <i class="fas fa-search"></i>
-                         </button>
-                     </div>
-                 </form>
-
-                 <table class="table table-hover mt-3">
-                     <thead >
-                     <tr>
-                         <th scope="col">reserva</th>
-                         <th scope="col">checkIn</th>
-                         <th scope="col">checkOut</th>
-                         <th scope="col">precio</th>
-                         <th scope="col">categoria</th>
-                         <th scope="col">habitacion</th>
-                     </tr>
-                     </thead>
-                     <tbody>
-                     <!--
-                     <tr>
-                         @if(busqueda.info() != null)
-                             <td class="text-capitalize">${busqueda.info().reserva()}</td>
-                             <td class="text-capitalize">${String.valueOf(busqueda.info().checkIn())}</td>
-                             <td class="text-capitalize">${String.valueOf(busqueda.info().checkOut())}</td>
-                             <td class="text-capitalize">${new DecimalFormat("#,###.00").format(busqueda.info().precio())}</td>
-                             <td class="text-capitalize">${busqueda.info().categoria()}</td>
-                             <td class="text-capitalize">${busqueda.info().habitacion().toString()}</td>
-                             <td class="text-capitalize"><a id="btnEliminar" class="btn btn-outline-danger btn-block">Eliminar</a></td>
-                         @endif
-                     </tr>
-                     --->
-                     </tbody>
-                 </table>
 
              </div>
 
